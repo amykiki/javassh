@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!--指定连接数据库所用的驱动-->
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <!--指定连接数据库的url-->
+        <property name="connection.url">jdbc:mysql://localhost/ssh_db</property>
+        <!--指定连接数据库用户名-->
+        <property name="connection.username">amy</property>
+        <!--指定连接数据库密码-->
+        <property name="connection.password">123</property>
+        <!--指定连接池最大连接数-->
+        <property name="hibernate.c3p0.max_size">20</property>
+        <!--指定连接池最小连接数-->
+        <property name="hibernate.c3p0.min_size">1</property>
+        <!--指定连接池连接超时时长-->
+        <property name="hibernate.c3p0.timeout">5000</property>
+        <!--指定连接池里最大可缓存statement对象-->
+        <property name="hibernate.c3p0.max_statements">100</property>
+        <property name="hibernate.c3p0.idle_test_period">3000</property>
+        <property name="hibernate.c3p0.acquire_increment">2</property>
+        <property name="hibernate.c3p0.validate">true</property>
+
+        <!--指定数据库方言-->
+        <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+        <!--根据需要自动创建数据表-->
+        <property name="hbm2ddl.auto">update</property>
+        <!--显示hibernate持久化操作所产生的sql-->
+        <property name="show_sql">true</property>
+        <!--将sql脚本格式化后再输出-->
+        <property name="hibernate.format_sql">true</property>
+        <!--罗列所有持久化类的类名-->
+        <mapping class="ch05.enumerated.Person"/>
+        <mapping class="ch05.list.Person1"/>
+        <mapping class="ch05.map.Person2"/>
+        <mapping class="ch05.embeddable.Person3"/>
+        <mapping class="ch05.componetCollection.Person4"/>
+        <mapping class="ch05.collectionComponent.Person5"/>
+        <mapping class="ch06.many2one.Person6"/>
+        <mapping class="ch06.many2one.Address6"/>
+        <mapping class="ch06.one2one.Person7"/>
+        <mapping class="ch06.one2one.Address7"/>
+        <mapping class="ch06.one2many.Person8"/>
+        <mapping class="ch06.one2many.Address8"/>
+        <mapping class="ch06.many2one.Person9"/>
+        <mapping class="ch06.many2one.Address9"/>
+        <mapping class="ch06.many2many.Person10"/>
+        <mapping class="ch06.many2many.Address10"/>
+    </session-factory>
+</hibernate-configuration>
