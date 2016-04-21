@@ -39,7 +39,16 @@ public class HibernateUtil {
         Session session = SESSION_THREAD_LOCAL.get();
         SESSION_THREAD_LOCAL.set(null);
         if (session != null) {
+            System.out.println("==========CLOSE SESSION=================");
             session.close();
+        }
+    }
+
+    public static void flushSession() {
+        Session session = SESSION_THREAD_LOCAL.get();
+        if (session != null) {
+            session.flush();
+            session.clear();
         }
     }
 }

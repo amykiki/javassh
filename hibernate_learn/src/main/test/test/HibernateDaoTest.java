@@ -219,7 +219,7 @@ public class HibernateDaoTest {
             Person10 p = (Person10) session.load(Person10.class, 2);
             System.out.println(p.getName());
             System.out.println(p.getAddress().toString());
-            
+
 
             tx.commit();
         } catch (HibernateException e) {

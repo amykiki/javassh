@@ -49,5 +49,8 @@
         <mapping class="ch06.many2one.Address9"/>
         <mapping class="ch06.many2many.Person10"/>
         <mapping class="ch06.many2many.Address10"/>
+        <mapping class="learn.model.Special"/>
+        <mapping class="learn.model.Classroom"/>
+        <mapping class="learn.model.Student"/>
     </session-factory>
 </hibernate-configuration>
