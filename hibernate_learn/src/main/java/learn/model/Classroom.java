@@ -1,5 +1,9 @@
 package learn.model;
 
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -8,6 +12,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "t_classroom")
+//@BatchSize(size = 16)
 public class Classroom {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "c_id")
@@ -18,6 +23,8 @@ public class Classroom {
     @JoinColumn(name = "s_id", referencedColumnName = "s_id")
     private Special special;
     @OneToMany(targetEntity = Student.class, mappedBy = "classroom")
+//    @Fetch(FetchMode.SUBSELECT)
+//    @BatchSize(size = 10)
     private Set<Student> stus;
 
     public Classroom() {
