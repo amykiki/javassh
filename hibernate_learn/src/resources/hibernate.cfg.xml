@@ -32,6 +32,19 @@
         <property name="show_sql">true</property>
         <!--将sql脚本格式化后再输出-->
         <property name="hibernate.format_sql">true</property>
+        <!--开启hibernate二级缓存-->
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+        <!--开启查询缓存-->
+        <property name="hibernate.cache.use_query_cache">true</property>
+        <!--设置二级缓存区实现类-->
+        <property name="hibernate.cache.provider_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</property>
+        <!--设置EhCahce配置文件路径-->
+        <property name="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</property>
+        <!--开启二级缓存统计功能-->
+        <property name="hibernate.generate_statistics">true</property>
+        <!--设置使用结构化方式来维护缓存项-->
+        <property name="hibernate.cache.use_structured_entries">true</property>
         <!--罗列所有持久化类的类名-->
         <mapping class="ch05.enumerated.Person"/>
         <mapping class="ch05.list.Person1"/>

@@ -12,7 +12,7 @@ public class HibernateUtil {
     private static final ThreadLocal<Session> SESSION_THREAD_LOCAL = new ThreadLocal<>();
     private static SessionFactory sf = null;
 
-    private static SessionFactory getSf() {
+    public static SessionFactory getSf() {
         if (sf == null) {
             synchronized (HibernateUtil.class) {
                 if (sf == null) {

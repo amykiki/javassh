@@ -1,12 +1,17 @@
 package learn.model;
 
+import org.hibernate.annotations.*;
+
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Created by Amysue on 2016/4/21.
  */
 @Entity
 @Table(name = "t_stu")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public class Student {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "p_id")
