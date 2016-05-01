@@ -11,7 +11,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "t_stu")
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public class Student {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "p_id")
@@ -21,6 +21,8 @@ public class Student {
     @ManyToOne(targetEntity = Classroom.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "c_id", referencedColumnName = "c_id")
     private Classroom classroom;
+    @Version
+    private int version;
 
     public Student() {
     }
@@ -29,6 +31,14 @@ public class Student {
         this.name = name;
         this.sex = sex;
         this.classroom = classroom;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     public int getId() {

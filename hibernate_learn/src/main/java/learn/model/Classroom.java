@@ -23,7 +23,7 @@ public class Classroom {
     @JoinColumn(name = "s_id", referencedColumnName = "s_id")
     private Special special;
     @OneToMany(targetEntity = Student.class, mappedBy = "classroom")
-//    @Fetch(FetchMode.SUBSELECT)
+    @Fetch(FetchMode.SUBSELECT)
 //    @BatchSize(size = 10)
     private Set<Student> stus;
 

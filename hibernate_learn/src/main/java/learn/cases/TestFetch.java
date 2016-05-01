@@ -122,8 +122,8 @@ public class TestFetch {
             for (Classroom cla : clas) {
                 System.out.println(cla.getName());
                 for (Student stu : cla.getStus()) {
-//                    System.out.println(stu.getName());
-                    stu.getName();
+                    System.out.println(stu.getName() + "," + cla.getName() + "," + cla.getGrade());
+//                    stu.getName();
                 }
             }
 
