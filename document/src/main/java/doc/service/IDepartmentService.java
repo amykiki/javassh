@@ -20,6 +20,8 @@ public interface IDepartmentService {
 
     public List<Department> listAllDep();
 
+    public List<Department> listAllDepScope(int depId);
+
     public Department getDepByName(String name);
 
     public void updateDepScope(int depId, Integer[] scopeDepIds);

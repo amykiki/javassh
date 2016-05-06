@@ -22,11 +22,11 @@
     <s:iterator value="#ds">
         <tr>
             <td>${id}</td>
-            <td>${name}</td>
+            <td><a href="dep_show.action?dep.id=${id}">${name}</a></td>
             <td>
-                <a href="dep_updateInput.action?id=${id}">更新</a>
-                <a href="dep_delete.action?id=${id}">删除</a>
-                <a href="dep_updateScope.action?id=${id}">设置可发文部门</a>
+                <a href="dep_updateInput.action?dep.id=${id}">更新</a>
+                <a href="dep_delete.action?dep.id=${id}">删除</a>
+                <a href="dep_updateScopeInput.action?dep.id=${id}">设置可发文部门</a>
             </td>
         </tr>
     </s:iterator>

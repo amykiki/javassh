@@ -2,7 +2,6 @@ package doc.service;
 
 import doc.dao.IDepScopeDao;
 import doc.dao.IDepartmentDao;
-import doc.entity.DepScope;
 import doc.entity.Department;
 import doc.exception.DocException;
 import org.springframework.stereotype.Service;
@@ -103,13 +102,22 @@ public class DepartmentService implements IDepartmentService {
         List<Integer> ods = depScopeDao.listDepScopeIds(depId);
         List<Integer> sds = new ArrayList<>(Arrays.asList(scopeDepIds));
         List<Integer> dds = new ArrayList<>(ods);
-        if (dds.removeAll(sds)) {
+        dds.removeAll(sds);
+        if (dds.size() > 0) {
             depScopeDao.deleteScope(depId, dds);
         }
-        if (sds.removeAll(ods)) {
+        sds.removeAll(ods);
+        if (sds.size() > 0) {
             for (int sId : sds) {
                 depScopeDao.addDepScope(depId, sId);
             }
         }
+    }
+
+    @Override
+    public List<Department> listAllDepScope(int depId) {
+        String hql = "select ds.scopeDep from DepScope ds where ds.depId = ?";
+        List<Department> depScopes = depDao.list(hql, depId);
+        return depScopes;
     }
 }

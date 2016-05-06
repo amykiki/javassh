@@ -102,4 +102,32 @@ public class DepartmentServiceTest {
         depService.updateDepScope(2, new Integer[]{13, 16, 6, 7, 3, 4, 10});
 
     }
+
+    @Test
+    public void testGetDepDao() throws Exception {
+
+    }
+
+    @Test
+    public void testSetDepDao() throws Exception {
+
+    }
+
+    @Test
+    public void testGetDepScopeDao() throws Exception {
+
+    }
+
+    @Test
+    public void testSetDepScopeDao() throws Exception {
+
+    }
+
+    @Test
+    public void testListAllDepScope() throws Exception {
+        List<Department> dscopes = depService.listAllDepScope(2);
+        for (Department d : dscopes) {
+            System.out.println(d);
+        }
+    }
 }
