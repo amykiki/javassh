@@ -45,6 +45,26 @@ public class Department {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (this == o) return true;
+        if (!(o instanceof Department)) return false;
+
+        Department that = (Department) o;
+
+        if (getId() != that.getId()) return false;
+        return getName().equals(that.getName());
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId();
+        result = 31 * result + getName().hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "Department{" +
                 "id=" + id +

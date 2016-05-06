@@ -23,7 +23,7 @@
     <!--Configure jdbc.properties-->
     <bean id="propertyConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-          p:location="jdbc.properties"/>
+          p:location="classpath:jdbc.properties"/>
 
     <!--Data Source Configuration-->
     <bean id="dataSource"

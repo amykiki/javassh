@@ -18,7 +18,7 @@ import java.util.List;
 @Service("depService")
 public class DepartmentService implements IDepartmentService {
     private IDepartmentDao depDao;
-    private IDepScopeDao depScopeDao;
+    private IDepScopeDao   depScopeDao;
 
     public IDepartmentDao getDepDao() {
         return depDao;
@@ -39,7 +39,7 @@ public class DepartmentService implements IDepartmentService {
     }
 
     @Override
-    public void add(Department department) throws DocException{
+    public void add(Department department) throws DocException {
         if (getDepByName(department.getName()) != null) {
             throw new DocException("[" + department.getName() + "]已经创建了");
         }
@@ -49,6 +49,7 @@ public class DepartmentService implements IDepartmentService {
 
     @Override
     public void delete(int id) {
+        //// TODO: 2016/5/6  考虑如果用用户和message存在则不应删除
         depDao.delete(id);
     }
 
@@ -58,7 +59,15 @@ public class DepartmentService implements IDepartmentService {
     }
 
     @Override
-    public void update(Department department) {
+    public void update(Department department) throws DocException {
+        Department oDep = getDepByName(department.getName());
+        if (oDep != null) {
+            if (oDep.equals(department)) {
+                return;
+            } else {
+                throw new DocException("[" + department.getName() + "]已经创建了");
+            }
+        }
         depDao.update(department);
     }
 
@@ -71,7 +80,7 @@ public class DepartmentService implements IDepartmentService {
     @Override
     public Department getDepByName(String name) {
         String hql = "from Department where name = ?";
-        return (Department)depDao.queryByHQL(hql, name);
+        return (Department) depDao.queryByHQL(hql, name);
     }
 
     @Override

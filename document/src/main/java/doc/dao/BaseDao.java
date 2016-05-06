@@ -71,6 +71,7 @@ public class BaseDao<T> implements IBaseDao<T>{
 
     @Override
     public T load(int id) {
+//        return get(id);
         return (T) getSession().load(getPersistentClass(), id);
     }
 

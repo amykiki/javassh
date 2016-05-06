@@ -32,9 +32,11 @@ public class DepartmentServiceTest {
 //            dep.setName(name);
 //            depService.add(dep);
 //        }
-        dep.setName("法学院");
-        depService.add(dep);
-        dep.setName("历史系");
+//        dep.setName("法学院");
+//        depService.add(dep);
+//        dep.setName("历史系");
+//        dep.setName("中文系");
+        dep.setName("校长办公室");
         depService.add(dep);
     }
 

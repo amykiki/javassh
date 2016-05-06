@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE validators PUBLIC
+        "-//Apache Struts//XWork Validator 1.0.3//EN"
+        "http://struts.apache.org/dtds/xwork-validator-1.0.3.dtd">
+<validators>
+    <field name="dep.name">
+        <field-validator type="requiredstring" short-circuit="true">
+            <message>必须输入部门名字</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="minLength">2</param>
+            <message>部门名不能小于2</message>
+        </field-validator>
+    </field>
+</validators>

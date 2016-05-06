@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+    <constant name="struts.enable.DynamicMethodInvocation" value="false"/>
+    <constant name="struts.devMode" value="true"/>
+    <constant name="struts.action.extension" value="action,do"/>
+    <constant name="struts.i18n.encoding" value="utf-8"/>
+    <constant name="struts.tag.altSyntax" value="true"/>
+    <constant name="struts.ui.theme" value="xhtml"/>
+    
+    <package name="default" namespace="/" extends="struts-default">
+        <interceptors>
+            <interceptor-stack name="docInterceptor">
+                <interceptor-ref name="defaultStack">
+                    <param name="validateAnnotatedMethodOnly">true</param>
+                    <param name="validation.excludeMethods">input,back,cancel,browse,list,addInput</param>
+                </interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+        <action name="*_*" class="{1}Action" method="{2}">
+            <result>/WEB-INF/content/{1}/{2}.jsp</result>
+            <result name="input">/WEB-INF/content/{1}/{2}Input.jsp</result>
+            <result name="redirect" type="redirect">${url}</result>
+            <interceptor-ref name="docInterceptor"/>
+        </action>
+    </package>
+</struts>

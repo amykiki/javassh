@@ -16,7 +16,7 @@ public interface IDepartmentService {
 
     public Department load(int id);
 
-    public void update(Department department);
+    public void update(Department department)throws DocException;
 
     public List<Department> listAllDep();
 
