@@ -10,4 +10,5 @@ import java.util.List;
  */
 @Repository("depDao")
 public class DepartmentDao extends BaseDao<Department> implements IDepartmentDao {
+
 }

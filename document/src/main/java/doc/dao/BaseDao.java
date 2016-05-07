@@ -62,6 +62,8 @@ public class BaseDao<T> implements IBaseDao<T>{
         if (t != null) {
             getSession().delete(t);
         }
+       /* T t = load(id);
+        getSession().delete(t);*/
     }
 
     @Override

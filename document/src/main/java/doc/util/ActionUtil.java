@@ -2,6 +2,7 @@ package doc.util;
 
 import com.opensymphony.xwork2.ActionContext;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -23,6 +24,16 @@ public class ActionUtil {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
 
+    public static void copyNotNullProperties(Object dest, Object src) {
+        BeanUtilsBean notNull = new NullAwareBeanUtilsBean();
+        try {
+            notNull.copyProperties(dest, src);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 }
