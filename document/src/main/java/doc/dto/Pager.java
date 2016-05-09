@@ -7,12 +7,12 @@ import java.util.List;
  */
 public class Pager<T> {
     private List<T> datas;
-    private int pageOffset;
-    private int pageSize;
-    private long totalRecords;
-    private int allPageNums;
-    private int begin;
-    private int end;
+    private int     toPage;
+    private int     pageSize;
+    private int    totalRecords;
+    private int     allPageNums;
+    private int     begin;
+    private int     end;
 
     public List<T> getDatas() {
         return datas;
@@ -22,12 +22,12 @@ public class Pager<T> {
         this.datas = datas;
     }
 
-    public int getPageOffset() {
-        return pageOffset;
+    public int getToPage() {
+        return toPage;
     }
 
-    public void setPageOffset(int pageOffset) {
-        this.pageOffset = pageOffset;
+    public void setToPage(int toPage) {
+        this.toPage = toPage;
     }
 
     public int getPageSize() {
@@ -38,11 +38,11 @@ public class Pager<T> {
         this.pageSize = pageSize;
     }
 
-    public long getTotalRecords() {
+    public int getTotalRecords() {
         return totalRecords;
     }
 
-    public void setTotalRecords(long totalRecords) {
+    public void setTotalRecords(int totalRecords) {
         this.totalRecords = totalRecords;
     }
 

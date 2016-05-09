@@ -1,0 +1,196 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: Amysue
+  Date: 2016/5/9
+  Time: 12:09
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="s" uri="/struts-tags" %>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/xml; charset=UTF-8">
+    <title>用户列表</title>
+    <style>
+        #formwrapper {
+            margin: 5px auto;
+            padding: 10px;
+        }
+
+        .button {
+            text-align: center;
+            width: auto;
+        }
+
+        .button input {
+            width: auto;
+        }
+
+        .wwFormTable {
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .checks {
+            width: 110px;
+            display: inline-block;
+        }
+        .checks input {
+            float: left;
+            height: 17px;
+        }
+        .checks label {
+            float: left;
+            margin-left: 3px;
+            text-align: left;
+            vertical-align: middle;
+            width: 90px;
+        }
+        .radios {
+            width: 350px;
+        }
+        .radios label {
+            width: 50px;
+        }
+    </style>
+    <script type="text/javascript">
+        function checkAll(ele) {
+            var cbs = document.getElementsByTagName('input');
+            for (var i = 0; i < cbs.length; i++) {
+                if (cbs[i].type == 'checkbox') {
+                    cbs[i].checked = true;
+                }
+            }
+        }
+        function unCheckAll(ele) {
+            var cbs = document.getElementsByTagName('input');
+            for (var i = 0; i < cbs.length; i++) {
+                if (cbs[i].type == 'checkbox') {
+                    cbs[i].checked = false;
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+<div id="formwrapper">
+    <s:form action="user_list" method="post" cssClass="wwFormTable" theme="simple">
+        <fieldset>
+            <legend>用户查询</legend>
+            <div class="radio-div">
+                <label for="name">用户名</label>
+                <s:textfield name="findParams.username" label="用户名" id="name"/>
+            </div>
+            <div class="radio-div">
+                <label for="nickname">用户昵称</label>
+                <s:textfield name="findParams.nickname" label="用户昵称" id="nickname"/>
+            </div>
+            <div>
+                <s:iterator value="#allds">
+                    <div class="checks">
+                        <s:checkbox fieldValue="%{id}" value="%{id in findParams.deps}" name="findParams.deps"/>
+                        <label>${name}</label>
+                    </div>
+                </s:iterator>
+            </div>
+            <div class="checks radios">
+                <s:set value="@doc.enums.Role@NORMAL" name="normal"/>
+                <s:set value="@doc.enums.Role@ADMIN" name="admin"/>
+                <s:radio name="findParams.role" label="选择权限"
+                         list="roleParams"
+                         value="findParams.role"
+                         listKey="key"
+                         listValue="value"/>
+            </div>
+            <div class="button">
+                <input type="button" value="全选" onclick="checkAll(this)"/>
+                <input type="button" value="取消全选" onclick="unCheckAll(this)"/>
+                <input type="submit" name="search" value="查询"/>
+                <input type="reset" value="重置"/>
+                <div class="clear-float"></div>
+            </div>
+        </fieldset>
+        <table class="list">
+            <tr>
+                <th>id</th>
+                <th>用户名</th>
+                <th>用户密码</th>
+                <th>用户昵称</th>
+                <th>用户邮箱</th>
+                <th>用户权限</th>
+                <th>用户部门</th>
+                <th>操作</th>
+            </tr>
+            <s:iterator value="#fusers.datas">
+                <tr>
+                    <td>${id}</td>
+                    <td>${username}</td>
+                    <td>${password}</td>
+                    <td>${nickname}</td>
+                    <td>${email}</td>
+                    <s:if test="%{role.toString() == 'ADMIN'}">
+                        <td><a href="#">管理员</a></td>
+                    </s:if>
+                    <s:else>
+                        <td><a href="#">普通用户</a></td>
+                    </s:else>
+                    <td>
+                        ${dep.name}
+                    </td>
+                    <td>
+                        <a href="#">编辑</a>
+                        <a href="#">删除</a>
+                    </td>
+                </tr>
+            </s:iterator>
+            <%--<c:forEach items="${pLists.tLists}" var="u">
+                <tr>
+                    <td>${u.id}</td>
+                    <td>${u.username}</td>
+                    <td>${u.password}</td>
+                    <td><a href="/user.do?method=show&userid=${u.id}">${u.nickname}</a></td>
+                    <c:choose>
+                        <c:when test="${u.id == lguser.id}">
+                            <c:choose>
+                                <c:when test="${u.role == ADMIN}">
+                                    <td>管理员</td>
+                                </c:when>
+                                <c:otherwise>
+                                    <td>普通用户</td>
+                                </c:otherwise>
+                            </c:choose>
+                            <td><a href="/user.do?method=updateUser&userid=${u.id}">编辑</a></td>
+                            <td>&nbsp;</td>
+                        </c:when>
+                        <c:otherwise>
+                            <c:choose>
+                                <c:when test="${u.role == ADMIN}">
+                                    <td><a href="${configurl}&method=changeAuth&userids=${u.id}&roles=<%=Role.NORMAL.toString()%>">管理员</a></td>
+                                </c:when>
+                                <c:otherwise>
+                                    <td><a href="${configurl}&method=changeAuth&userids=${u.id}&roles=<%=Role.ADMIN.toString()%>">普通用户</a></td>
+                                </c:otherwise>
+                            </c:choose>
+                            <td><a href="/user.do?method=updateUser&userid=${u.id}">编辑</a>&nbsp;
+                                <a href="${configurl}&method=delete&userids=${u.id}">删除</a>
+                            </td>
+                            <td><input type="checkbox" name="userids"
+                                       value="${u.id}"/></td>
+                        </c:otherwise>
+                    </c:choose>
+                </tr>
+            </c:forEach>--%>
+        </table>
+    </s:form>
+    <s:debug/>
+</div>
+<%--<jsp:include page="/inc/pager.jsp">
+    &lt;%&ndash;<jsp:param name="pageurl" value="${pageurl}"/>&ndash;%&gt;
+    <jsp:param name="currentPage" value="fusers.toPage"/>
+    <jsp:param name="allPageNums" value="fusers.allPageNums"/>
+    <jsp:param name="begin" value="fusers.begin}"/>
+    <jsp:param name="end" value="fusers.end"/>
+</jsp:include>--%>
+
+</body>
+</html>

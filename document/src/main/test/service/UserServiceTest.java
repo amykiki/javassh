@@ -81,7 +81,7 @@ public class UserServiceTest {
 
     @Test
     public void testFindUser() throws Exception {
-
+        userService.findUser(null);
     }
 
     @Test
@@ -96,14 +96,16 @@ public class UserServiceTest {
                                11, 13, 16, 17, 18, 19, 20};
         for (int i = 0; i < deps.length; i++) {
             int k = 1;
+            int depId = deps[i];
             while (k <= 30) {
                 User u = new User();
-                u.setUsername("user" + i + k);
-                u.setEmail("user" + i + k + "@amy_doc.com");
+                u.setUsername("user" + depId + k);
+                u.setEmail("user" + depId + k + "@amy_doc.com");
                 u.setPassword("1234");
                 u.setNickname(getName());
-//                u.setRole( );
-                k--;
+                u.setRole(getRole());
+                userService.add(u, depId);
+                k++;
             }
 
         }
@@ -138,6 +140,15 @@ public class UserServiceTest {
             String n2 = name2[ran.nextInt(name2.length)];
             String n3 = name3[ran.nextInt(name3.length)];
             return n1+n2+n3;
+        }
+    }
+
+    private Role getRole() {
+        boolean admin = ran.nextInt(30) > 28 ? true: false;
+        if (admin) {
+            return Role.ADMIN;
+        } else {
+            return Role.NORMAL;
         }
     }
 }

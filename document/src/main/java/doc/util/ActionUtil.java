@@ -5,6 +5,8 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Amysue on 2016/5/6.
@@ -36,4 +38,34 @@ public class ActionUtil {
             e.printStackTrace();
         }
     }
+
+    public static Object stringToObj(Class<?> clz, String s){
+//        Department{id=2, name='教务处'}
+        Pattern r = Pattern.compile(".*\\{(.*)}");
+        Matcher m = r.matcher(s);
+        if (m.find()) {
+            s = m.group(1);
+        }
+        String[] sp = s.split(", ");
+        Object o = null;
+        try {
+            o = clz.getConstructor().newInstance();
+            for (String p : sp) {
+                String[] maps = p.split("=");
+                String fieldName = maps[0];
+                String fieldValue = maps[1];
+                BeanUtils.setProperty(o, fieldName, fieldValue);
+            }
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return o;
+    }
+
 }

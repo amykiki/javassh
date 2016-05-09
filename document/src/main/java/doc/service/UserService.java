@@ -5,8 +5,11 @@ import doc.dao.IUserDao;
 import doc.dto.Pager;
 import doc.entity.Department;
 import doc.entity.User;
+import doc.enums.Role;
 import doc.exception.DocException;
 import doc.util.ActionUtil;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -17,7 +20,7 @@ import java.util.Map;
  */
 @Service("userService")
 public class UserService implements IUserService {
-    private IUserDao userDao;
+    private IUserDao       userDao;
     private IDepartmentDao depDao;
 
     @Resource(name = "userDao")
@@ -52,25 +55,25 @@ public class UserService implements IUserService {
     @Override
     public User loadLazyByUsername(String username) {
         String hql = "select u from User u where u.username = ?";
-        return (User)userDao.queryByHQL(hql, username);
+        return (User) userDao.queryByHQL(hql, username);
     }
 
     @Override
     public User loadEagerByUsername(String username) {
         String hql = "select u from User u left join fetch u.dep where u.username = ?";
-        return (User)userDao.queryByHQL(hql, username);
+        return (User) userDao.queryByHQL(hql, username);
     }
 
     @Override
     public User loadLazyById(int id) {
         String hql = "select u from User u where u.id = ?";
-        return (User)userDao.queryByHQL(hql, id);
+        return (User) userDao.queryByHQL(hql, id);
     }
 
     @Override
     public User loadEagerById(int id) {
         String hql = "select u from User u left join fetch u.dep where u.id = ?";
-        return (User)userDao.queryByHQL(hql, id);
+        return (User) userDao.queryByHQL(hql, id);
     }
 
     @Override
@@ -110,6 +113,34 @@ public class UserService implements IUserService {
 
     @Override
     public Pager<User> findUser(Map<String, Object> params) {
-        return null;
+        DetachedCriteria query = DetachedCriteria.forClass(User.class);
+        if (params.get("username") != null) {
+            String username = (String) params.get("username");
+            if (username != null && !username.trim().equals("")) {
+                query.add(Restrictions.like("username", "%" + username + "%"));
+            }
+        }
+        if (params.get("nickname") != null) {
+            String nickname = (String) params.get("nickname");
+            if (nickname != null && !nickname.trim().equals("")) {
+                query.add(Restrictions.like("nickname", "%" + nickname + "%"));
+            }
+        }
+        if (params.get("role") != null) {
+            try {
+                String role = (String) params.get("role");
+                Role r1 = Role.valueOf(role);
+                query.add(Restrictions.eq("role", r1));
+            } catch (Exception e) {
+//                e.printStackTrace();
+            }
+
+        }
+        if (params.get("deps") != null) {
+            Integer[] depIds = (Integer[]) params.get("deps");
+            query.add(Restrictions.in("dep.id", depIds));
+        }
+        Pager<User> list = userDao.find(query, "dep");
+        return list;
     }
 }

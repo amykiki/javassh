@@ -1,6 +1,8 @@
 package doc.dao;
 
 import doc.dto.*;
+import org.hibernate.criterion.DetachedCriteria;
+
 import java.util.List;
 
 /**
@@ -19,7 +21,7 @@ public interface IBaseDao<T> {
     public List<T> list(String hql, Object... args);
     public List<Object> listObj(String hql, Object... args);
 
-    public Pager<T> find(String hql, int pageOffset, int pageSize, Object... args);
+    public Pager<T> find(DetachedCriteria query, String associationPath);
 
     public void executeHQL(String hql, Object... args);
 

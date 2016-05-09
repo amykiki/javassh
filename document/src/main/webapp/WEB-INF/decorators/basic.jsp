@@ -60,7 +60,7 @@
             <a class="dropbtn" onclick="dropDownNav()" href="javascript:void(0)">全部功能</a>
             <div id="myDropdown" class="dropdown-content">
                 <a href="<%=request.getContextPath()%>/dep_list.action">部门管理</a>
-                <a href="#">用户管理</a>
+                <a href="<%=request.getContextPath()%>/user_list.action">用户管理</a>
                 <a href="#">个人信息</a>
                 <a href="#">公文信息</a>
             </div>
@@ -71,6 +71,9 @@
             <li><a href="<%=request.getContextPath()%>/dep_list.action">部门列表</a></li>
             <li><a href="<%=request.getContextPath()%>/dep_addInput.action">添加部门</a></li>
         </s:if>
+        <s:elseif test="%{#actionType.contains('user')}">
+            <li><a href="<%=request.getContextPath()%>/user_list.action">用户列表</a></li>
+        </s:elseif>
        <%-- <c:choose>
             <c:when test="${not empty lguser.username}">
                     <c:choose>

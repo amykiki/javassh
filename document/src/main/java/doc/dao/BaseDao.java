@@ -1,13 +1,10 @@
 package doc.dao;
 
-import doc.dto.*;
-import org.apache.logging.log4j.Logger;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.stereotype.Repository;
+import doc.dto.Pager;
+import doc.dto.SystemContext;
+import org.hibernate.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
 
 import javax.annotation.Resource;
 import java.lang.reflect.ParameterizedType;
@@ -94,27 +91,66 @@ public class BaseDao<T> implements IBaseDao<T>{
     }
 
     @Override
-    public Pager<T> find(String hql, int pageOffset, int pageSize, Object... args) {
-        Query query = getHQL(hql, args);
-        int count = getCountByHQL();
-        if (pageOffset < 0 || pageOffset >= count) {
-            pageOffset = 0;
-        }
+    public Pager<T> find(DetachedCriteria query, String associationPath) {
+        query.setProjection(Projections.rowCount());
+        List list = query.getExecutableCriteria(getSession()).list();
+        int count = ((Long)list.get(0)).intValue();
+        int toPage = SystemContext.getToPage();
+        int pageSize = SystemContext.getPageSize();
+        int pageRange = SystemContext.getPageRange();
+        int begin       = 0;
+        int end         = 0;
+        int offSet = 0;
+        int allPageNums = 0;
         if (pageSize <= 0) {
             pageSize = 10;
         }
-        query.setFirstResult(pageOffset).setMaxResults(pageSize);
+        if (count == 0) {
+            toPage = 0;
+            allPageNums = 0;
+        } else {
+            allPageNums = (count - 1) / pageSize + 1;
+            if (toPage > allPageNums) {
+                toPage = allPageNums;
+            } else if (toPage <= 0) {
+                toPage = 1;
+            }
+            //get begin and end index
+            begin = toPage - pageRange/ 2;
+            if (begin < 1) {
+                begin = 1;
+            }
+            end = begin - 1 + pageRange;
+            if (end > allPageNums) {
+                begin -= end - allPageNums;
+                if (begin < 1) {
+                    begin = 1;
+                }
+                end = allPageNums;
+            }
+            offSet = (toPage - 1) * pageSize;
+        }
+
+        query.setProjection(null);
+        query.setResultTransformer(Criteria.ROOT_ENTITY);
+        if (associationPath != null) {
+            query.setFetchMode(associationPath, FetchMode.JOIN);
+        }
+        List<T> data = query.getExecutableCriteria(getSession())
+                .setFirstResult(offSet)
+                .setMaxResults(pageSize)
+                .list();
         Pager<T> pager = new Pager<>();
-        pager.setPageOffset(pageOffset);
+        pager.setToPage(toPage);
         pager.setPageSize(pageSize);
-        pager.setDatas(query.list());
+        pager.setDatas(data);
         pager.setTotalRecords(count);
+        pager.setBegin(begin);
+        pager.setEnd(end);
+        pager.setAllPageNums(allPageNums);
         return pager;
     }
 
-    private int getCountByHQL() {
-        return 0;
-    }
 
     @Override
     public void executeHQL(String hql, Object... args) {
