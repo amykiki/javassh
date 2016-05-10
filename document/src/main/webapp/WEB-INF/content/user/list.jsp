@@ -74,7 +74,7 @@
 </head>
 <body>
 <div id="formwrapper">
-    <s:form action="user_list" method="post" cssClass="wwFormTable" theme="simple">
+    <s:form id="uForm" action="user_list" method="post" cssClass="wwFormTable" theme="simple">
         <fieldset>
             <legend>用户查询</legend>
             <div class="radio-div">
@@ -88,8 +88,8 @@
             <div>
                 <s:iterator value="#allds">
                     <div class="checks">
-                        <s:checkbox fieldValue="%{id}" value="%{id in findParams.deps}" name="findParams.deps"/>
-                        <label>${name}</label>
+                        <s:checkbox fieldValue="%{id}" value="%{id in findParams.deps}" name="findParams.deps" id="dep_%{id}"/>
+                        <label for="dep_${id}">${name}</label>
                     </div>
                 </s:iterator>
             </div>
@@ -105,7 +105,7 @@
             <div class="button">
                 <input type="button" value="全选" onclick="checkAll(this)"/>
                 <input type="button" value="取消全选" onclick="unCheckAll(this)"/>
-                <input type="submit" name="search" value="查询"/>
+                <input type="submit" value="查询"/>
                 <input type="reset" value="重置"/>
                 <div class="clear-float"></div>
             </div>
@@ -143,54 +143,17 @@
                     </td>
                 </tr>
             </s:iterator>
-            <%--<c:forEach items="${pLists.tLists}" var="u">
-                <tr>
-                    <td>${u.id}</td>
-                    <td>${u.username}</td>
-                    <td>${u.password}</td>
-                    <td><a href="/user.do?method=show&userid=${u.id}">${u.nickname}</a></td>
-                    <c:choose>
-                        <c:when test="${u.id == lguser.id}">
-                            <c:choose>
-                                <c:when test="${u.role == ADMIN}">
-                                    <td>管理员</td>
-                                </c:when>
-                                <c:otherwise>
-                                    <td>普通用户</td>
-                                </c:otherwise>
-                            </c:choose>
-                            <td><a href="/user.do?method=updateUser&userid=${u.id}">编辑</a></td>
-                            <td>&nbsp;</td>
-                        </c:when>
-                        <c:otherwise>
-                            <c:choose>
-                                <c:when test="${u.role == ADMIN}">
-                                    <td><a href="${configurl}&method=changeAuth&userids=${u.id}&roles=<%=Role.NORMAL.toString()%>">管理员</a></td>
-                                </c:when>
-                                <c:otherwise>
-                                    <td><a href="${configurl}&method=changeAuth&userids=${u.id}&roles=<%=Role.ADMIN.toString()%>">普通用户</a></td>
-                                </c:otherwise>
-                            </c:choose>
-                            <td><a href="/user.do?method=updateUser&userid=${u.id}">编辑</a>&nbsp;
-                                <a href="${configurl}&method=delete&userids=${u.id}">删除</a>
-                            </td>
-                            <td><input type="checkbox" name="userids"
-                                       value="${u.id}"/></td>
-                        </c:otherwise>
-                    </c:choose>
-                </tr>
-            </c:forEach>--%>
         </table>
+        <s:include value="/inc/pager.jsp">
+            <s:param name="formId">uForm</s:param>
+            <s:param name="currentPage" value="#fusers.toPage"/>
+            <s:param name="allPageNums" value="#fusers.allPageNums"/>
+            <s:param name="begin" value="#fusers.begin"/>
+            <s:param name="end" value="#fusers.end"/>
+        </s:include>
     </s:form>
-    <s:debug/>
+    <%--<s:debug/>--%>
 </div>
-<%--<jsp:include page="/inc/pager.jsp">
-    &lt;%&ndash;<jsp:param name="pageurl" value="${pageurl}"/>&ndash;%&gt;
-    <jsp:param name="currentPage" value="fusers.toPage"/>
-    <jsp:param name="allPageNums" value="fusers.allPageNums"/>
-    <jsp:param name="begin" value="fusers.begin}"/>
-    <jsp:param name="end" value="fusers.end"/>
-</jsp:include>--%>
 
 </body>
 </html>
