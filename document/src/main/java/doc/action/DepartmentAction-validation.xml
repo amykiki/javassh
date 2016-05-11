@@ -4,7 +4,7 @@
         "http://struts.apache.org/dtds/xwork-validator-1.0.3.dtd">
 <validators>
     <field name="dep.name">
-        <field-validator type="requiredstring" short-circuit="true">
+        <field-validator type="requiredstring">
             <message>必须输入部门名字</message>
         </field-validator>
         <field-validator type="stringlength">

@@ -71,4 +71,9 @@ public class ActionUtil {
         return o;
     }
 
+    public static String redirectToList(String listName) {
+        ActionUtil.setUrl("/" + listName + "_list.action");
+        return ActionUtil.REDIRECT;
+    }
+
 }

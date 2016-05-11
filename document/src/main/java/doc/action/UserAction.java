@@ -6,6 +6,7 @@ import doc.dto.Pager;
 import doc.entity.Department;
 import doc.entity.User;
 import doc.enums.Role;
+import doc.exception.DocException;
 import doc.service.IDepartmentService;
 import doc.service.IUserService;
 import doc.util.ActionUtil;
@@ -30,6 +31,7 @@ public class UserAction extends ActionSupport{
     private String role;
     private User cUser;
     private int pageOffset = 0;
+    private List<Department> allds;
     private IUserService       userService;
     private IDepartmentService depService;
    {
@@ -60,6 +62,14 @@ public class UserAction extends ActionSupport{
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public List<Department> getAllds() {
+        return allds;
+    }
+
+    public void setAllds(List<Department> allds) {
+        this.allds = allds;
     }
 
     public User getcUser() {
@@ -117,14 +127,36 @@ public class UserAction extends ActionSupport{
         return ActionUtil.FORWARD;
     }
 
+    @SkipValidation
     public String updateInput() {
-        cUser = userService.loadLazyById(uid);
+        cUser = userService.loadEagerById(uid);
         if (cUser != null) {
+            allds   = depService.listAllDep();
+            role = cUser.getRole().toString();
             return SUCCESS;
         } else {
             addActionError("ID为" + uid + "用户不存在");
             return ActionUtil.GERROR;
         }
+    }
+
+    public String update() {
+        try {
+            cUser.setId(uid);
+            cUser.setRole(Role.valueOf(role));
+            userService.update(cUser, cUser.getDep().getId());
+        } catch (DocException e) {
+            allds   = depService.listAllDep();
+            addActionError(e.getMessage());
+            return INPUT;
+        }
+
+        return ActionUtil.redirectToList("user");
+    }
+
+    @Override
+    public void validate() {
+        allds   = depService.listAllDep();
     }
 
     @SkipValidation
@@ -153,10 +185,9 @@ public class UserAction extends ActionSupport{
             String[] pNickname = (String[])findParams.get("nickname");
             findParams.put("nickname", pNickname[0]);
         }
-        List<Department> allDeps   = depService.listAllDep();
+        allds   = depService.listAllDep();
         Pager<User>      findUsers = userService.findUser(findParams, pageOffset);
         ActionContext.getContext().put("fusers", findUsers);
-        ActionContext.getContext().put("allds", allDeps);
         return SUCCESS;
     }
   /*  @SkipValidation

@@ -90,9 +90,12 @@ public class UserService implements IUserService {
             throw new DocException("不存在的部门");
         }
         User oldUser = loadLazyByUsername(user.getUsername());
-        if (oldUser != null && oldUser.getId() != user.getId()) {
+        if (oldUser == null) {
+            oldUser = loadLazyById(user.getId());
+        } else if(oldUser.getId() != user.getId()){
             throw new DocException("[" + user.getUsername() + "]已经存在");
         }
+
         user.setDep(department);
         ActionUtil.copyNotNullProperties(oldUser, user);
     }

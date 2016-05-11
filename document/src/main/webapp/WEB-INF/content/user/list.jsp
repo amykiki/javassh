@@ -110,7 +110,7 @@
                 <s:textfield name="findParams.nickname" label="用户昵称" id="nickname"/>
             </div>
             <div>
-                <s:iterator value="#allds">
+                <s:iterator value="allds">
                     <div class="checks">
                         <s:checkbox fieldValue="%{id}" value="%{id in findParams.deps}" name="findParams.deps" id="dep_%{id}"/>
                         <label for="dep_${id}">${name}</label>
