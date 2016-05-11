@@ -2,6 +2,8 @@ package doc.dao;
 
 import doc.dto.Pager;
 import doc.dto.SystemContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.*;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
@@ -15,6 +17,7 @@ import java.util.List;
  * Created by Amysue on 2016/5/2.
  */
 public class BaseDao<T> implements IBaseDao<T>{
+    protected Logger logger;
     private SessionFactory sessionFactory;
     private Class<T>       persistentClass;
 
@@ -26,6 +29,7 @@ public class BaseDao<T> implements IBaseDao<T>{
         } else if (type instanceof ParameterizedType) {
             this.persistentClass = (Class<T>) ((ParameterizedType)type).getRawType();
         }
+        logger = LogManager.getLogger(persistentClass);
 //        persistentClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
@@ -91,11 +95,11 @@ public class BaseDao<T> implements IBaseDao<T>{
     }
 
     @Override
-    public Pager<T> find(DetachedCriteria query, String associationPath) {
+    public Pager<T> find(DetachedCriteria query, String associationPath, int pageOffset) {
         query.setProjection(Projections.rowCount());
         List list = query.getExecutableCriteria(getSession()).list();
         int count = ((Long)list.get(0)).intValue();
-        int toPage = SystemContext.getToPage();
+        int toPage = pageOffset;
         int pageSize = SystemContext.getPageSize();
         int pageRange = SystemContext.getPageRange();
         int begin       = 0;
@@ -141,6 +145,7 @@ public class BaseDao<T> implements IBaseDao<T>{
                 .setMaxResults(pageSize)
                 .list();
         Pager<T> pager = new Pager<>();
+        logger.info("toPage = " + toPage);
         pager.setToPage(toPage);
         pager.setPageSize(pageSize);
         pager.setDatas(data);
@@ -162,6 +167,11 @@ public class BaseDao<T> implements IBaseDao<T>{
     public Object queryByHQL(String hql, Object... args) {
         Query query = getHQL(hql, args);
         return query.uniqueResult();
+    }
+
+    @Override
+    public List queryByCriteria(DetachedCriteria query) {
+        return query.getExecutableCriteria(getSession()).list();
     }
 
     private Query getHQL(String hql, Object... args) {

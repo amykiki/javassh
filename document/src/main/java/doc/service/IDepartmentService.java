@@ -12,7 +12,7 @@ import java.util.List;
 public interface IDepartmentService {
     public void add(Department department) throws DocException;
 
-    public void delete(int id);
+    public void delete(int id) throws DocException;
 
     public Department load(int id);
 

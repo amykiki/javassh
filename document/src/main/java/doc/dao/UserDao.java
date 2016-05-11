@@ -1,9 +1,11 @@
 package doc.dao;
 
 import doc.entity.User;
-import org.hibernate.FetchMode;
-import org.hibernate.criterion.*;
-import org.hibernate.sql.JoinType;
+import doc.enums.Role;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,6 +15,21 @@ import java.util.List;
  */
 @Repository("userDao")
 public class UserDao extends BaseDao<User> implements IUserDao{
+    @Override
+    public int getUserNum(int depId) {
+        DetachedCriteria query = DetachedCriteria.forClass(User.class);
+        query.add(Restrictions.eq("dep.id", depId));
+        query.setProjection(Projections.rowCount());
+        int count = ((Long)queryByCriteria(query).get(0)).intValue();
+        return count;
+    }
+
+    @Override
+    public void updateRole(Role role, int uId) {
+        String hql = "update User set role = ? where id = ?";
+        executeHQL(hql, role, uId);
+    }
+
     @Override
     public List findByCriteria(DetachedCriteria query) {
  /*       List list = getSession().createCriteria(User.class)

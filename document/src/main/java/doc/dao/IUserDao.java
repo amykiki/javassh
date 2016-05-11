@@ -1,6 +1,7 @@
 package doc.dao;
 
 import doc.entity.User;
+import doc.enums.Role;
 import org.hibernate.criterion.DetachedCriteria;
 
 import java.util.List;
@@ -10,4 +11,8 @@ import java.util.List;
  */
 public interface IUserDao extends IBaseDao<User> {
     public List findByCriteria(DetachedCriteria query);
+
+    public int getUserNum(int depId);
+
+    public void updateRole(Role role, int uId);
 }

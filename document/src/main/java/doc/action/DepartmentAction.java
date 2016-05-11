@@ -100,7 +100,16 @@ public class DepartmentAction extends ActionSupport{
 
     @SkipValidation
     public String delete() {
-        depService.delete(dep.getId());
+        try {
+            depService.delete(dep.getId());
+        } catch (DocException e) {
+            addFieldError("dep.id", e.getMessage());
+            addActionError(e.getMessage());
+            addActionMessage(e.getMessage());
+            list();
+            ActionUtil.setUrl("dep/list.jsp");
+            return ActionUtil.FORWARD;
+        }
         return redirectToList();
     }
 

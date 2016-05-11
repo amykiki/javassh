@@ -70,6 +70,30 @@
                 }
             }
         }
+        function modifyUser(uid, methodName, paramValue) {
+            var theForm = document.getElementById("uForm");
+            var actionStr = "user_";
+            actionStr = actionStr.concat(methodName, ".action");
+            theForm.action = actionStr;
+            var delId = document.createElement("input");
+            delId.type = "hidden";
+            delId.name = "uid";
+            delId.value = uid;
+            theForm.appendChild(delId);
+            if (methodName == "updateRole") {
+                var roleType = document.createElement("input");
+                roleType.type = "hidden";
+                roleType.name = "role";
+                roleType.value = paramValue;
+                theForm.appendChild(roleType);
+            }
+            var pageOffset = document.createElement("input");
+            pageOffset.type = "hidden";
+            pageOffset.name = "pageOffset";
+            pageOffset.value = ${fusers.toPage};
+            theForm.appendChild(pageOffset);
+            theForm.submit();
+        }
     </script>
 </head>
 <body>
@@ -110,47 +134,55 @@
                 <div class="clear-float"></div>
             </div>
         </fieldset>
-        <table class="list">
-            <tr>
-                <th>id</th>
-                <th>用户名</th>
-                <th>用户密码</th>
-                <th>用户昵称</th>
-                <th>用户邮箱</th>
-                <th>用户权限</th>
-                <th>用户部门</th>
-                <th>操作</th>
-            </tr>
-            <s:iterator value="#fusers.datas">
+        <s:if test="%{#fusers.allPageNums >= 1}">
+            <table class="list">
                 <tr>
-                    <td>${id}</td>
-                    <td>${username}</td>
-                    <td>${password}</td>
-                    <td>${nickname}</td>
-                    <td>${email}</td>
-                    <s:if test="%{role.toString() == 'ADMIN'}">
-                        <td><a href="#">管理员</a></td>
-                    </s:if>
-                    <s:else>
-                        <td><a href="#">普通用户</a></td>
-                    </s:else>
-                    <td>
-                        ${dep.name}
-                    </td>
-                    <td>
-                        <a href="#">编辑</a>
-                        <a href="#">删除</a>
-                    </td>
+                    <th>id</th>
+                    <th>用户名</th>
+                    <th>用户密码</th>
+                    <th>用户昵称</th>
+                    <th>用户邮箱</th>
+                    <th>用户权限</th>
+                    <th>用户部门</th>
+                    <th>操作</th>
                 </tr>
-            </s:iterator>
-        </table>
-        <s:include value="/inc/pager.jsp">
-            <s:param name="formId">uForm</s:param>
-            <s:param name="currentPage" value="#fusers.toPage"/>
-            <s:param name="allPageNums" value="#fusers.allPageNums"/>
-            <s:param name="begin" value="#fusers.begin"/>
-            <s:param name="end" value="#fusers.end"/>
-        </s:include>
+                <s:iterator value="#fusers.datas">
+                    <tr>
+                        <td>${id}</td>
+                        <td>${username}</td>
+                        <td>${password}</td>
+                        <td>${nickname}</td>
+                        <td>${email}</td>
+                        <s:if test="%{role.toString() == 'ADMIN'}">
+                            <td><a href="#" onclick="modifyUser(${id}, 'updateRole', '${role}')" class="redColor">管理员</a></td>
+                        </s:if>
+                        <s:else>
+                            <td><a href="#" onclick="modifyUser(${id}, 'updateRole', '${role}')">普通用户</a></td>
+                        </s:else>
+                        <td>
+                                ${dep.name}
+                        </td>
+                        <td>
+                            <a href="/user_updateInput.action?uid=${id}">编辑</a>
+                            <a href="#" onclick="modifyUser(${id}, 'delete', '')">删除</a>
+                        </td>
+                    </tr>
+                </s:iterator>
+            </table>
+            <s:include value="/inc/pager.jsp">
+                <s:param name="formId">uForm</s:param>
+                <s:param name="currentPage" value="#fusers.toPage"/>
+                <s:param name="allPageNums" value="#fusers.allPageNums"/>
+                <s:param name="begin" value="#fusers.begin"/>
+                <s:param name="end" value="#fusers.end"/>
+            </s:include>
+        </s:if>
+        <s:else>
+            <div class="errorMessage" align="center">
+                要查询的用户不存在
+            </div>
+        </s:else>
+
     </s:form>
     <%--<s:debug/>--%>
 </div>

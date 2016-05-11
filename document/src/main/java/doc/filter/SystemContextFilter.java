@@ -20,19 +20,17 @@ public class SystemContextFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        int pageOffset = 0;
+       /* int pageOffset = 0;
         try {
             pageOffset = Integer.parseInt(servletRequest.getParameter("pageOffset"));
         } catch (NumberFormatException e) {
 
-        }
+        }*/
          try {
-             SystemContext.setToPage(pageOffset);
              SystemContext.setPageSize(pageSize);
              SystemContext.setPageRange(pageRange);
              filterChain.doFilter(servletRequest, servletResponse);
          } finally {
-             SystemContext.removeToPage();
              SystemContext.removePageRange();
              SystemContext.RemovePageSize();
          }

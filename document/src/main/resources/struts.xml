@@ -19,10 +19,14 @@
                 </interceptor-ref>
             </interceptor-stack>
         </interceptors>
+        <global-results>
+            <result name="gerror">/WEB-INF/content/error/GlobalError.jsp</result>
+        </global-results>
         <action name="*_*" class="{1}Action" method="{2}">
             <result>/WEB-INF/content/{1}/{2}.jsp</result>
             <result name="input">/WEB-INF/content/{1}/{2}Input.jsp</result>
             <result name="redirect" type="redirect">${url}</result>
+            <result name="forward">/WEB-INF/content/${url}</result>
             <interceptor-ref name="docInterceptor"/>
         </action>
     </package>

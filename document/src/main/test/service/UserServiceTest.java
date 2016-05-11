@@ -81,7 +81,7 @@ public class UserServiceTest {
 
     @Test
     public void testFindUser() throws Exception {
-        userService.findUser(null);
+        userService.findUser(null, 0);
     }
 
     @Test
@@ -150,5 +150,30 @@ public class UserServiceTest {
         } else {
             return Role.NORMAL;
         }
+    }
+
+    @Test
+    public void testLoadLazyByUsername() throws Exception {
+
+    }
+
+    @Test
+    public void testLoadEagerByUsername() throws Exception {
+
+    }
+
+    @Test
+    public void testLoadLazyById() throws Exception {
+
+    }
+
+    @Test
+    public void testLoadEagerById() throws Exception {
+
+    }
+
+    @Test
+    public void testUpdateRole() throws Exception {
+        userService.updateRole(Role.NORMAL, 9898);
     }
 }

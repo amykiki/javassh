@@ -21,10 +21,12 @@ public interface IBaseDao<T> {
     public List<T> list(String hql, Object... args);
     public List<Object> listObj(String hql, Object... args);
 
-    public Pager<T> find(DetachedCriteria query, String associationPath);
+    public Pager<T> find(DetachedCriteria query, String associationPath, int pageOffset);
 
     public void executeHQL(String hql, Object... args);
 
     public Object queryByHQL(String hql, Object... args);
+
+    public List queryByCriteria(DetachedCriteria query);
 
 }

@@ -97,6 +97,11 @@ public class UserService implements IUserService {
         ActionUtil.copyNotNullProperties(oldUser, user);
     }
 
+    @Override
+    public void updateRole(Role role, int uId) {
+        userDao.updateRole(role, uId);
+    }
+
     /*@Override
     public void update(User user) throws DocException{
         User oldUser = loadEagerById(user.getId());
@@ -112,7 +117,7 @@ public class UserService implements IUserService {
     }*/
 
     @Override
-    public Pager<User> findUser(Map<String, Object> params) {
+    public Pager<User> findUser(Map<String, Object> params, int pageOffset) {
         DetachedCriteria query = DetachedCriteria.forClass(User.class);
         if (params.get("username") != null) {
             String username = (String) params.get("username");
@@ -140,7 +145,7 @@ public class UserService implements IUserService {
             Integer[] depIds = (Integer[]) params.get("deps");
             query.add(Restrictions.in("dep.id", depIds));
         }
-        Pager<User> list = userDao.find(query, "dep");
+        Pager<User> list = userDao.find(query, "dep", pageOffset);
         return list;
     }
 }

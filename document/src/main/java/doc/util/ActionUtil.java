@@ -3,6 +3,7 @@ package doc.util;
 import com.opensymphony.xwork2.ActionContext;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.lang3.builder.StandardToStringStyle;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.regex.Matcher;
@@ -13,6 +14,8 @@ import java.util.regex.Pattern;
  */
 public class ActionUtil {
     public final static String REDIRECT = "redirect";
+    public final static String FORWARD = "forward";
+    public final static String GERROR = "gerror";
 
     public static void setUrl(String url) {
         ActionContext.getContext().put("url", url);

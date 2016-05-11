@@ -24,24 +24,26 @@
 </script>
 <fmt:parseNumber var="currentPage" type="number" value="${param.currentPage}" />
 <fmt:parseNumber var="allPageNums" type="number" value="${param.allPageNums}" />
-<ul class="tsc_pagination tsc_paginationA tsc_paginationA05">
-    <li><a href="${param.pageurl}&toPage=1">首页</a></li>
-    <c:if test="${currentPage > 1}">
-        <li><a href="#" onclick="submitPage(${currentPage-1})">前一页</a></li>
-    </c:if>
-    <c:forEach var="i" begin="${param.begin}" end="${param.end}">
-        <c:choose>
-            <c:when test="${i == currentPage}">
-                <li><a href="#" class="current">${i}</a></li>
-            </c:when>
-            <c:otherwise>
-                <li><a href="#" onclick="submitPage(${i})">${i}</a></li>
-            </c:otherwise>
-        </c:choose>
-    </c:forEach>
-    <c:if test="${currentPage < allPageNums}">
-        <li><a href="#" onclick="submitPage(${currentPage+1})">下一页</a></li>
-    </c:if>
-    <li><a href="#" onclick="submitPage(${allPageNums})">尾页</a></li>
-</ul>
+ <c:if test="${allPageNums >= 1}">
+     <ul class="tsc_pagination tsc_paginationA tsc_paginationA05">
+         <li><a href="#" onclick="submitPage(1)">首页</a></li>
+         <c:if test="${currentPage > 1}">
+             <li><a href="#" onclick="submitPage(${currentPage-1})">前一页</a></li>
+         </c:if>
+         <c:forEach var="i" begin="${param.begin}" end="${param.end}">
+             <c:choose>
+                 <c:when test="${i == currentPage}">
+                     <li><a href="#" class="current">${i}</a></li>
+                 </c:when>
+                 <c:otherwise>
+                     <li><a href="#" onclick="submitPage(${i})">${i}</a></li>
+                 </c:otherwise>
+             </c:choose>
+         </c:forEach>
+         <c:if test="${currentPage < allPageNums}">
+             <li><a href="#" onclick="submitPage(${currentPage+1})">下一页</a></li>
+         </c:if>
+         <li><a href="#" onclick="submitPage(${allPageNums})">尾页</a></li>
+     </ul>
+ </c:if>
 

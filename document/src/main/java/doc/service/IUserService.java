@@ -2,6 +2,7 @@ package doc.service;
 
 import doc.dto.Pager;
 import doc.entity.User;
+import doc.enums.Role;
 import doc.exception.DocException;
 
 import java.util.Map;
@@ -22,9 +23,10 @@ public interface IUserService {
     public User loadEagerById(int id);
     public void update(User user, int depId) throws DocException;
 
-//    public void update(User user) throws DocException;
+    //    public void update(User user) throws DocException;
+    public void updateRole(Role role, int uId);
 
-    public Pager<User> findUser(Map<String, Object> params);
+    public Pager<User> findUser(Map<String, Object> params, int pageOffset);
 
 
 }

@@ -13,6 +13,7 @@
     <title>部门列表</title>
 </head>
 <body>
+<s:actionerror theme="simple"/>
 <table class="list">
     <tr>
         <th>部门id</th>
@@ -31,5 +32,6 @@
         </tr>
     </s:iterator>
 </table>
+<s:debug/>
 </body>
 </html>

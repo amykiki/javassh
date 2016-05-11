@@ -2,6 +2,7 @@ package doc.service;
 
 import doc.dao.IDepScopeDao;
 import doc.dao.IDepartmentDao;
+import doc.dao.IUserDao;
 import doc.entity.Department;
 import doc.exception.DocException;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 public class DepartmentService implements IDepartmentService {
     private IDepartmentDao depDao;
     private IDepScopeDao   depScopeDao;
+    private IUserDao userDao;
 
     public IDepartmentDao getDepDao() {
         return depDao;
@@ -37,6 +39,11 @@ public class DepartmentService implements IDepartmentService {
         this.depScopeDao = depScopeDao;
     }
 
+    @Resource(name = "userDao")
+    public void setUserDao(IUserDao userDao) {
+        this.userDao = userDao;
+    }
+
     @Override
     public void add(Department department) throws DocException {
         if (getDepByName(department.getName()) != null) {
@@ -47,8 +54,12 @@ public class DepartmentService implements IDepartmentService {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(int id)throws DocException {
         //// TODO: 2016/5/6  考虑如果用用户和message存在则不应删除
+        int count = userDao.getUserNum(id);
+        if (count > 0) {
+            throw new DocException("[" + load(id).getName() + "]有" +count+ "名用户，不能删除");
+        }
         depDao.delete(id);
     }
 
