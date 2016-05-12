@@ -13,6 +13,9 @@
 </head>
 <body>
 <s:actionerror/>
+<div class="errorMessage">
+    <s:property value="authinfo"/>
+</div>
 <s:form action="login_user" method="post">
     <s:textfield label="用户名称" name="cUser.username"/>
     <s:password label="用户密码" name="cUser.password"/>

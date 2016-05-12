@@ -13,8 +13,12 @@
 </head>
 <body>
 <h2>Global Error Occured</h2>
-<h3>
+<h3 class="errorMessage">
+    <s:property value="exception"/>
     <s:actionerror/>
+    <div class="errorMessage">
+        <s:property value="authinfo"/>
+    </div>
 </h3>
 </body>
 </html>

@@ -17,6 +17,9 @@ public class ActionUtil {
     public final static String REDIRECT = "redirect";
     public final static String FORWARD = "forward";
     public final static String GERROR = "gerror";
+    public final static String LOGIN = "login";
+    public final static String AUTHINFO = "authinfo";
+    public final static String WELCOME = "welcome";
 
     public static void setUrl(String url) {
         ActionContext.getContext().put("url", url);
