@@ -14,15 +14,10 @@
         .wwFormTable input[radio] {
             height: 14px;
         }
+        button a {
+            color: #666666;
+            display: inline-block;
 
-        .sradio {
-            height: 14px;
-            vertical-align: middle;
-            float: left;
-        }
-
-        .sselect {
-            float: left;
         }
     </style>
 </head>
@@ -46,14 +41,20 @@
     </tr>
     <tr>
         <td>用户权限</td>
-        <td>${lguser.role}</td>
+        <s:if test="#session.lguser.role.toString() == 'ADMIN'">
+            <td>管理员</td>
+        </s:if>
+        <s:else>
+            <td>普通用户</td>
+        </s:else>
+
     </tr>
     <tr>
         <td>用户部门</td>
         <td>${lguser.dep.name}</td>
     </tr>
 </table>
-<button>更新用户</button>
-
+<button onclick="location.href='/user_updateSelfInput.action';">更新用户</button>
+<s:debug/>
 </body>
 </html>

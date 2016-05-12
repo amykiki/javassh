@@ -106,6 +106,12 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public void updatePwd(int uid, String pwd) {
+        String hql = "update User set password = ? where id = ?";
+        userDao.executeHQL(hql, pwd, uid);
+    }
+
+    @Override
     public Pager<User> findUser(Map<String, Object> params, int pageOffset) {
         DetachedCriteria query = DetachedCriteria.forClass(User.class);
         if (params.get("username") != null) {

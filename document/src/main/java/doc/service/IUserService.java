@@ -23,6 +23,8 @@ public interface IUserService {
     public User loadEagerById(int id);
     public void update(User user, int depId) throws DocException;
 
+    public void updatePwd(int uid, String pwd);
+
     //    public void update(User user) throws DocException;
     public void updateRole(Role role, int uId);
 

@@ -98,6 +98,13 @@ public class LoginAction extends ActionSupport {
     }
 
     @SkipValidation
+    public String logout() {
+        ActionContext.getContext().getSession().remove("lguser");
+        ActionUtil.setUrl("/login_userInput.action");
+        return ActionUtil.REDIRECT;
+    }
+
+    @SkipValidation
     public String user() {
         if (cUser.getUsername() == null || cUser.getUsername().length() < 3 ||
                 cUser.getPassword() == null || cUser.getPassword().length() < 4) {
@@ -109,7 +116,7 @@ public class LoginAction extends ActionSupport {
             addActionError("输入用户名或密码不正确");
             return INPUT;
         }
-        ActionContext.getContext().getSession().put("lguser", lguser);
+        ActionUtil.setLguser(lguser);
         ActionUtil.setUrl("/user_showSelf.action");
         return ActionUtil.REDIRECT;
     }

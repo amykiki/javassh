@@ -31,13 +31,4 @@
             <message>邮箱格式不正确</message>
         </field-validator>
     </field>
-    <field name="role">
-        <field-validator type="requiredstring">
-            <message>必须选择用户权限</message>
-        </field-validator>
-        <field-validator type="regex">
-            <param name="regex"><![CDATA[ADMIN|NORMAL]]></param>
-            <message>用户权限只能为ADMIN或者NORMAL</message>
-        </field-validator>
-    </field>
 </validators>

@@ -48,6 +48,10 @@ public class ActionUtil {
 
     }
 
+    public static void setLguser(User lguser) {
+        ActionContext.getContext().getSession().put("lguser", lguser);
+    }
+
 
     public static Object stringToObj(Class<?> clz, String s){
 //        Department{id=2, name='教务处'}

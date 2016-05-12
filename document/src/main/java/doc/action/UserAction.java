@@ -30,6 +30,7 @@ public class UserAction extends ActionSupport{
     private int uid;
     private String role;
     private User cUser;
+    private String oldPwd;
     private int pageOffset = 0;
     private List<Department> allds;
     private IUserService       userService;
@@ -78,6 +79,14 @@ public class UserAction extends ActionSupport{
 
     public void setcUser(User cUser) {
         this.cUser = cUser;
+    }
+
+    public String getOldPwd() {
+        return oldPwd;
+    }
+
+    public void setOldPwd(String oldPwd) {
+        this.oldPwd = oldPwd;
     }
 
     public int getPageOffset() {
@@ -162,6 +171,53 @@ public class UserAction extends ActionSupport{
     @SkipValidation
     public String showSelf() {
         return SUCCESS;
+    }
+
+    @SkipValidation
+    public String updateSelfInput() {
+        cUser = ActionUtil.getLguser();
+        return SUCCESS;
+    }
+
+    public String updateSelf() {
+        User lguser = ActionUtil.getLguser();
+        //以下属性用户不能修改,必须由admin用户修改
+        cUser.setId(lguser.getId());
+        cUser.setDep(lguser.getDep());
+        cUser.setRole(lguser.getRole());
+        //这里不允许修改密码
+        cUser.setPassword(lguser.getPassword());
+
+        try {
+            userService.update(cUser, lguser.getDep().getId());
+        } catch (DocException e) {
+            addActionError(e.getMessage());
+            return INPUT;
+        }
+        lguser = userService.loadEagerById(lguser.getId());
+        ActionUtil.setLguser(lguser);
+        ActionUtil.setUrl("/user_showSelf.action");
+        return ActionUtil.REDIRECT;
+    }
+
+    public String updatePwdInput() {
+        return SUCCESS;
+    }
+
+    public String updatePwd() {
+        if (cUser.getPassword() == null || cUser.getPassword().length() < 4 || cUser.getPassword().length() > 10) {
+            addFieldError("cUser.password", "密码长度不能小于4位不能大于10位");
+            return INPUT;
+        }
+        User lguser = ActionUtil.getLguser();
+        if (!lguser.getPassword().equals(oldPwd)) {
+            addFieldError("oldPwd", "原有密码不正确，不能修改");
+            return INPUT;
+        }
+        userService.updatePwd(lguser.getId(), cUser.getPassword());
+        lguser.setPassword(cUser.getPassword());
+        ActionUtil.setUrl("/user_showSelf.action");
+        return ActionUtil.REDIRECT;
     }
 
     @SkipValidation

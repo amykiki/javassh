@@ -50,9 +50,10 @@
         </s:if>
         <s:else>
             欢迎[
-                <a href="<%=request.getContextPath()%>/user.do?method=show&userid=${lguser.id}">${lguser.nickname}</a>
+                <a href="<%=request.getContextPath()%>/user_showSelf.action">${lguser.nickname}</a>
                 ]登录文档管理系统
-                <a href="<%=request.getContextPath()%>/user.do?method=logout">注销</a>
+                <a href="<%=request.getContextPath()%>/user_updatePwdInput.action">修改密码</a>
+                <a href="<%=request.getContextPath()%>/login_logout.action">注销</a>
         </s:else>
     </div>
     <s:if test="#session.lguser != null">
