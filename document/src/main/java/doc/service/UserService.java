@@ -105,20 +105,6 @@ public class UserService implements IUserService {
         userDao.updateRole(role, uId);
     }
 
-    /*@Override
-    public void update(User user) throws DocException{
-        User oldUser = loadEagerById(user.getId());
-        String newUsername = user.getUsername();
-        if (newUsername != null && !newUsername.equals(oldUser.getUsername())) {
-            if (loadLazyByUsername(newUsername) != null) {
-                throw new DocException("[" + user.getUsername() + "]已经存在");
-            }
-        }
-        ActionUtil.copyNotNullProperties(oldUser, user);
-//        不再需要调用update
-//        userDao.update(user);
-    }*/
-
     @Override
     public Pager<User> findUser(Map<String, Object> params, int pageOffset) {
         DetachedCriteria query = DetachedCriteria.forClass(User.class);

@@ -1,6 +1,7 @@
 package doc.util;
 
 import com.opensymphony.xwork2.ActionContext;
+import doc.entity.User;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.builder.StandardToStringStyle;
@@ -41,6 +42,12 @@ public class ActionUtil {
             e.printStackTrace();
         }
     }
+
+    public static User getLguser() {
+        return (User)ActionContext.getContext().getSession().get("lguser");
+
+    }
+
 
     public static Object stringToObj(Class<?> clz, String s){
 //        Department{id=2, name='教务处'}

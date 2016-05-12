@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE validators PUBLIC
+        "-//Apache Struts//XWork Validator 1.0.3//EN"
+        "http://struts.apache.org/dtds/xwork-validator-1.0.3.dtd">
+<validators>
+    <field name="cUser.username">
+        <field-validator type="requiredstring" short-circuit="false">
+            <message>必须输入用户名字</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="minLength">3</param>
+            <param name="maxLength">10</param>
+            <message>用户名长度不能小于3位不能大于10位</message>
+        </field-validator>
+    </field>
+    <field name="cUser.password">
+        <field-validator type="requiredstring">
+            <message>必须输入密码</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="minLength">4</param>
+            <param name="maxLength">10</param>
+            <message>密码不能小于4位不能大于10位</message>
+        </field-validator>
+        <field-validator type="expression">
+            <param name="expression">cUser.password == repeatPWD</param>
+            <message>输入密码不一致</message>
+        </field-validator>
+    </field>
+    <field name="cUser.nickname">
+        <field-validator type="requiredstring">
+            <param name="trim">true</param>
+            <message>必须输入用户昵称</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="trim">true</param>
+            <param name="minLength">2</param>
+            <message>用户名昵称不能小于2位</message>
+        </field-validator>
+    </field>
+    <field name="cUser.email">
+        <field-validator type="requiredstring">
+            <message>必须输入邮箱地址</message>
+        </field-validator>
+        <field-validator type="email" short-circuit="true">
+            <message>邮箱格式不正确</message>
+        </field-validator>
+    </field>
+</validators>

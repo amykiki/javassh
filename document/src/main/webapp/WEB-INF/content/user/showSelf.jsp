@@ -1,0 +1,59 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: Amysue
+  Date: 2016/5/11
+  Time: 15:41
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="s" uri="/struts-tags" %>
+<html>
+<head>
+    <title>用户详情</title>
+    <style>
+        .wwFormTable input[radio] {
+            height: 14px;
+        }
+
+        .sradio {
+            height: 14px;
+            vertical-align: middle;
+            float: left;
+        }
+
+        .sselect {
+            float: left;
+        }
+    </style>
+</head>
+<body>
+<table class="list">
+    <tr>
+        <td>用户id</td>
+        <td>${lguser.id}</td>
+    </tr>
+    <tr>
+        <td>用户名称</td>
+        <td>${lguser.username}</td>
+    </tr>
+    <tr>
+        <td>用户昵称</td>
+        <td>${lguser.nickname}</td>
+    </tr>
+    <tr>
+        <td>用户邮箱</td>
+        <td>${lguser.email}</td>
+    </tr>
+    <tr>
+        <td>用户权限</td>
+        <td>${lguser.role}</td>
+    </tr>
+    <tr>
+        <td>用户部门</td>
+        <td>${lguser.dep.name}</td>
+    </tr>
+</table>
+<button>更新用户</button>
+
+</body>
+</html>

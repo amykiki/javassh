@@ -160,6 +160,11 @@ public class UserAction extends ActionSupport{
     }
 
     @SkipValidation
+    public String showSelf() {
+        return SUCCESS;
+    }
+
+    @SkipValidation
     public String list() {
         if (findParams.get("role") == null) {
             findParams.put("role", "-1");
