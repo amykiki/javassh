@@ -5,6 +5,7 @@ import doc.entity.User;
 import doc.enums.Role;
 import doc.exception.DocException;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +30,10 @@ public interface IUserService {
     public void updateRole(Role role, int uId);
 
     public Pager<User> findUser(Map<String, Object> params, int pageOffset);
+
+    public List<User> listAllSendUsers(int id);
+
+    public List<Integer> listAllSendUsersId(int id);
 
 
 }

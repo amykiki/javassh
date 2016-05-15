@@ -8,6 +8,7 @@ import java.util.Properties;
  */
 public class PropertiesUtil {
     private static Properties authProp;
+    private static Properties paramsProp;
 
     public static Properties getAuthProp() {
         if (authProp == null) {
@@ -20,5 +21,17 @@ public class PropertiesUtil {
 
         }
         return authProp;
+    }
+
+    public static Properties getParamsProp() {
+        if (paramsProp == null) {
+            paramsProp = new Properties();
+            try {
+                paramsProp.load(PropertiesUtil.class.getClassLoader().getResourceAsStream("params.properties"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return paramsProp;
     }
 }

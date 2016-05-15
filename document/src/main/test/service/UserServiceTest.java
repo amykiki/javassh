@@ -176,4 +176,15 @@ public class UserServiceTest {
     public void testUpdateRole() throws Exception {
         userService.updateRole(Role.NORMAL, 9898);
     }
+
+    @Test
+    public void testListAllSendUsers() throws Exception {
+        userService.listAllSendUsers(2);
+        System.out.println(1);
+    }
+
+    @Test
+    public void testListAllSendUsersId() throws Exception {
+        userService.listAllSendUsersId(2);
+    }
 }

@@ -68,6 +68,11 @@ public class BaseDao<T> implements IBaseDao<T>{
     }
 
     @Override
+    public void delete(T t) {
+        getSession().delete(t);
+    }
+
+    @Override
     public void update(T t) {
         getSession().update(t);
     }

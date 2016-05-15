@@ -6,6 +6,8 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
+import org.hibernate.transform.ResultTransformer;
+import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,6 +30,34 @@ public class UserDao extends BaseDao<User> implements IUserDao{
     public void updateRole(Role role, int uId) {
         String hql = "update User set role = ? where id = ?";
         executeHQL(hql, role, uId);
+    }
+
+    @Override
+    public List<User> listAllSendUsers(int uId) {
+        String sql = "select tu2.*, tdep.* from t_user tu1 " +
+                "left join t_dep_scope td on tu1.dep_id = td.depId " +
+                "right join t_user tu2 on tu2.dep_id = td.scope_id " +
+                "LEFT JOIN t_dep tdep on tu2.dep_id = tdep.id " +
+                "where tu1.id = :id ORDER BY td.scope_id ASC";
+        List<User> users = getSession().createSQLQuery(sql)
+                .addEntity("tu2", User.class)
+                .addJoin("tdep", "tu2.dep")
+                .setParameter("id", uId)
+                .list();
+        return users;
+    }
+
+    @Override
+    public List<Integer> listAllSendUsersId(int uId) {
+        String sql = "select tu2.id from t_user tu1 " +
+                "left join t_dep_scope td on tu1.dep_id = td.depId " +
+                "right join t_user tu2 on tu2.dep_id = td.scope_id " +
+                "LEFT JOIN t_dep tdep on tu2.dep_id = tdep.id " +
+                "where tu1.id = :id ORDER BY td.scope_id ASC";
+        List<Integer> ids = getSession().createSQLQuery(sql)
+                .setParameter("id", uId)
+                .list();
+        return ids;
     }
 
     @Override

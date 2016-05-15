@@ -66,7 +66,7 @@
                         <a href="<%=request.getContextPath()%>/dep_list.action">部门管理</a>
                         <a href="<%=request.getContextPath()%>/user_list.action">用户管理</a>
                     </s:if>
-                    <a href="#">个人信息</a>
+                    <a href="#">私人邮件</a>
                     <a href="#">公文信息</a>
                 </div>
             </li>

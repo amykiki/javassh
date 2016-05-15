@@ -4,7 +4,6 @@ import com.opensymphony.xwork2.ActionContext;
 import doc.entity.User;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
-import org.apache.commons.lang3.builder.StandardToStringStyle;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.regex.Matcher;
@@ -20,6 +19,7 @@ public class ActionUtil {
     public final static String LOGIN = "login";
     public final static String AUTHINFO = "authinfo";
     public final static String WELCOME = "welcome";
+    private final static String ATTACHPATH = "attachpath";
 
     public static void setUrl(String url) {
         ActionContext.getContext().put("url", url);
@@ -88,6 +88,10 @@ public class ActionUtil {
     public static String redirectToList(String listName) {
         ActionUtil.setUrl("/" + listName + "_list.action");
         return ActionUtil.REDIRECT;
+    }
+
+    public static String getAttachPath() {
+        return PropertiesUtil.getParamsProp().getProperty(ATTACHPATH);
     }
 
 }

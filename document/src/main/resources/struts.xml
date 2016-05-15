@@ -12,7 +12,9 @@
     
     <package name="default" namespace="/" extends="struts-default">
         <interceptors>
+                <interceptor name="authInterceptor" class="authInterceptor"/>
             <interceptor-stack name="docInterceptor">
+                <interceptor-ref name="authInterceptor"/>
                 <interceptor-ref name="defaultStack">
                     <param name="validateAnnotatedMethodOnly">true</param>
                     <param name="validation.excludeMethods">input,back,cancel,browse,list,addInput</param>
@@ -21,6 +23,8 @@
         </interceptors>
         <global-results>
             <result name="gerror">/WEB-INF/content/error/GlobalError.jsp</result>
+            <result name="login">/WEB-INF/content/login/userInput.jsp</result>
+            <result name="welcome">/WEB-INF/content/user/showSelf.jsp</result>
         </global-results>
         <action name="*_*" class="{1}Action" method="{2}">
             <result>/WEB-INF/content/{1}/{2}.jsp</result>

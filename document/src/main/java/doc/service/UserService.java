@@ -13,6 +13,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -142,5 +143,17 @@ public class UserService implements IUserService {
         }
         Pager<User> list = userDao.find(query, "dep", pageOffset);
         return list;
+    }
+
+    @Override
+    public List<User> listAllSendUsers(int id) {
+        List<User> users = userDao.listAllSendUsers(id);
+        return users;
+    }
+
+    @Override
+    public List<Integer> listAllSendUsersId(int id) {
+        List<Integer> ids = userDao.listAllSendUsersId(id);
+        return ids;
     }
 }

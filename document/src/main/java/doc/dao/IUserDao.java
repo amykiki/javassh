@@ -15,4 +15,8 @@ public interface IUserDao extends IBaseDao<User> {
     public int getUserNum(int depId);
 
     public void updateRole(Role role, int uId);
+
+    public List<User> listAllSendUsers(int uId);
+
+    public List<Integer> listAllSendUsersId(int uId);
 }

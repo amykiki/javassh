@@ -13,6 +13,8 @@ public interface IBaseDao<T> {
 
     public void delete(int id);
 
+    public void delete(T t);
+
     public void update(T t);
 
     public T get(int id);
