@@ -16,7 +16,6 @@
             margin: 5px auto;
             padding: 10px;
         }
-
         .button {
             text-align: center;
             width: auto;

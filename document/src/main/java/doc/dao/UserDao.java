@@ -2,6 +2,7 @@ package doc.dao;
 
 import doc.entity.User;
 import doc.enums.Role;
+import org.hibernate.Criteria;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -34,7 +35,7 @@ public class UserDao extends BaseDao<User> implements IUserDao{
 
     @Override
     public List<User> listAllSendUsers(int uId) {
-        String sql = "select tu2.*, tdep.* from t_user tu1 " +
+        String sql = "select {tu2.*}, {tdep.*} from t_user tu1 " +
                 "left join t_dep_scope td on tu1.dep_id = td.depId " +
                 "right join t_user tu2 on tu2.dep_id = td.scope_id " +
                 "LEFT JOIN t_dep tdep on tu2.dep_id = tdep.id " +
@@ -42,6 +43,8 @@ public class UserDao extends BaseDao<User> implements IUserDao{
         List<User> users = getSession().createSQLQuery(sql)
                 .addEntity("tu2", User.class)
                 .addJoin("tdep", "tu2.dep")
+                .addEntity("tu2", User.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .setParameter("id", uId)
                 .list();
         return users;

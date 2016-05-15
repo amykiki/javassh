@@ -66,7 +66,7 @@
                         <a href="<%=request.getContextPath()%>/dep_list.action">部门管理</a>
                         <a href="<%=request.getContextPath()%>/user_list.action">用户管理</a>
                     </s:if>
-                    <a href="#">私人邮件</a>
+                    <a href="<%=request.getContextPath()%>/msg_listReceive.action">私人邮件</a>
                     <a href="#">公文信息</a>
                 </div>
             </li>
@@ -84,6 +84,17 @@
                         <a href="<%=request.getContextPath()%>/user_list.action">用户列表</a>
                     </li>
                 </s:elseif>
+            </s:if>
+            <s:if test="%{#actionType.contains('msg')}">
+                <li>
+                    <a href="<%=request.getContextPath()%>/msg_listReceive.action">已收邮件</a>
+                </li>
+                <li>
+                    <a href="<%=request.getContextPath()%>/msg_listSend.action">已发邮件</a>
+                </li>
+                <li>
+                    <a href="<%=request.getContextPath()%>/msg_addInput.action">添加邮件</a>
+                </li>
             </s:if>
                 <%--<s:property value="#actionType"/>--%>
             <div class="clear-float"></div>

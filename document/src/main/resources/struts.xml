@@ -9,10 +9,13 @@
     <constant name="struts.i18n.encoding" value="utf-8"/>
     <constant name="struts.tag.altSyntax" value="true"/>
     <constant name="struts.ui.theme" value="xhtml"/>
+    <constant name="struts.multipart.maxSize" value="1024000"/>
+    <constant name="struts.multipart.saveDir" value="D:\\IdealProj\\SSH\\document\\src\\main\\webapp\\temp"/>
+    <constant name="struts.objectFactory" value="org.apache.struts2.spring.StrutsSpringObjectFactory"/>
     
     <package name="default" namespace="/" extends="struts-default">
         <interceptors>
-                <interceptor name="authInterceptor" class="authInterceptor"/>
+            <interceptor name="authInterceptor" class="authInterceptor"/>
             <interceptor-stack name="docInterceptor">
                 <interceptor-ref name="authInterceptor"/>
                 <interceptor-ref name="defaultStack">

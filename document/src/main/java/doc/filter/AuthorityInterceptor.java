@@ -37,6 +37,7 @@ public class AuthorityInterceptor extends AbstractInterceptor {
         if (lguser == null) {
             if (!actionName.startsWith("login_") || actionName.equals("login_logout")) {
                 ctx.put(ActionUtil.AUTHINFO, "没有登录，请先登录");
+                ctx.getSession().put("loginAction", actionName);
                 return ActionUtil.LOGIN;
             }
         } else {

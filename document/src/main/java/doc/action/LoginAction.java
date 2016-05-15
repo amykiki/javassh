@@ -60,10 +60,12 @@ public class LoginAction extends ActionSupport {
     public void setRepeatPWD(String repeatPWD) {
         this.repeatPWD = repeatPWD;
     }
+
     @Resource(name = "userService")
     public void setUserService(IUserService userService) {
         this.userService = userService;
     }
+
     @Resource(name = "depService")
     public void setDepService(IDepartmentService depService) {
         this.depService = depService;
@@ -71,7 +73,7 @@ public class LoginAction extends ActionSupport {
 
     @SkipValidation
     public String registerInput() {
-        allds   = depService.listAllDep();
+        allds = depService.listAllDep();
         return SUCCESS;
     }
 
@@ -80,16 +82,17 @@ public class LoginAction extends ActionSupport {
         try {
             userService.add(cUser, depId);
         } catch (DocException e) {
-            allds   = depService.listAllDep();
+            allds = depService.listAllDep();
             addActionError(e.getMessage());
             return INPUT;
         }
         ActionUtil.setUrl("/login_userInput.action");
         return ActionUtil.REDIRECT;
     }
+
     @Override
     public void validate() {
-        allds   = depService.listAllDep();
+        allds = depService.listAllDep();
     }
 
     @SkipValidation
@@ -117,7 +120,13 @@ public class LoginAction extends ActionSupport {
             return INPUT;
         }
         ActionUtil.setLguser(lguser);
-        ActionUtil.setUrl("/user_showSelf.action");
+        String loginAction = (String)ActionContext.getContext().getSession().get("loginAction");
+        if ( loginAction != null && !loginAction.trim().equals("")) {
+            ActionUtil.setUrl("/" +loginAction + ".action");
+            ActionContext.getContext().getSession().remove("loginAction");
+        } else {
+            ActionUtil.setUrl("/user_showSelf.action");
+        }
         return ActionUtil.REDIRECT;
     }
 
