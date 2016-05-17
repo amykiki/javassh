@@ -18,7 +18,7 @@
     <!--打开spring annotation 支持-->
     <context:annotation-config/>
     <!--annotation scan package-->
-    <context:component-scan base-package="doc.action, doc.service, doc.dao"/>
+    <context:component-scan base-package="doc.action, doc.service, doc.dao, doc.filter"/>
 
     <!--Configure jdbc.properties-->
     <bean id="propertyConfigurer"

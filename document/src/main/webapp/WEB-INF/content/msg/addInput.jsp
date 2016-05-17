@@ -109,6 +109,7 @@
             ac.removeChild(obj.parentNode);
         }
     </script>
+    <script src="<%=request.getContextPath()%>/ckeditor/ckeditor.js"></script>
 </head>
 <body>
 <s:actionerror/>
@@ -156,7 +157,10 @@
             </div>
             <div>正文</div>
             <div class="content">
-                <s:textarea name="cMsg.content"/>
+                <s:textarea name="cMsg.content" id="mytextarea"/>
+                <script>
+                    CKEDITOR.replace('mytextarea');
+                </script>
             </div>
             <s:if test="#susers.size() > 0">
                 <div class="button">
