@@ -150,6 +150,7 @@
             </div>
             <div>
                 <input type="button" value="添加附件" id="addAttach" name="file" onclick="addAttachs()">
+                <s:fielderror><s:param>file</s:param></s:fielderror>
                 <div id="attachContainer">
                 </div>
             </div>

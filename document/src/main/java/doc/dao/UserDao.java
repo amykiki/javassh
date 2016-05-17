@@ -55,7 +55,6 @@ public class UserDao extends BaseDao<User> implements IUserDao{
         String sql = "select tu2.id from t_user tu1 " +
                 "left join t_dep_scope td on tu1.dep_id = td.depId " +
                 "right join t_user tu2 on tu2.dep_id = td.scope_id " +
-                "LEFT JOIN t_dep tdep on tu2.dep_id = tdep.id " +
                 "where tu1.id = :id ORDER BY td.scope_id ASC";
         List<Integer> ids = getSession().createSQLQuery(sql)
                 .setParameter("id", uId)

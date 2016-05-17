@@ -38,13 +38,11 @@ public class MessageServiceTest {
         attachment.setCreateDate(new Date());
         Attachment attachment2 = new Attachment();
         attachment2.setCreateDate(new Date());
-        attachService.add(attachment);
-        attachService.add(attachment2);
         List<Attachment> attachments = new ArrayList<>();
         attachments.add(attachment);
         attachments.add(attachment2);
         Message message = new Message();
-        msgService.add(message, attachments);
+//        msgService.add(message, attachments);
     }
 
     @Test

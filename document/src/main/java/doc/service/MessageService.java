@@ -2,12 +2,18 @@ package doc.service;
 
 import doc.dao.IAttachmentDao;
 import doc.dao.IMessageDao;
+import doc.dao.IUserMessageDao;
+import doc.dto.AttachDto;
 import doc.entity.Attachment;
 import doc.entity.Message;
+import doc.entity.User;
+import doc.entity.UserMessage;
+import doc.util.ActionUtil;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,29 +22,59 @@ import java.util.List;
 @Service("msgService")
 public class MessageService implements IMessageService {
     private IMessageDao msgDao;
-    private IAttachmentDao attachDao;
+    private IUserMessageDao userMsgDao;
+    private IAttachmentService attachService;
 
     @Resource(name = "msgDao")
     public void setMsgDao(IMessageDao msgDao) {
         this.msgDao = msgDao;
     }
 
-    @Resource(name ="attachDao" )
-    public void setAttachDao(IAttachmentDao attachDao) {
-        this.attachDao = attachDao;
+    @Resource(name = "attachService")
+    public void setAttachService(IAttachmentService attachService) {
+        this.attachService = attachService;
+    }
+
+    @Resource(name = "userMsgDao")
+    public void setUserMsgDao(IUserMessageDao userMsgDao) {
+        this.userMsgDao = userMsgDao;
     }
 
     @Override
-    public void add(Message msg, List<Attachment> attachments) {
-        msg.setAttachments(attachments);
+    public void add(Message msg, List<Integer> sendToIds, AttachDto attachDto) {
+        List<Attachment> attsList = null;
+        if (attachDto != null) {
+            attsList = attachService.add(attachDto);
+        }
+        msg.setCreateDate(new Date());
+        msg.setAuthor(ActionUtil.getLguser());
+        if (attsList != null) {
+            msg.setAttachments(attsList);
+        }
         msgDao.add(msg);
+        UserMessage umAuthor = new UserMessage();
+        umAuthor.setUser(ActionUtil.getLguser());
+        umAuthor.setMessage(msg);
+        umAuthor.setRead(true);
+        umAuthor.setSend(true);
+        userMsgDao.add(umAuthor);
+        for (int uid: sendToIds) {
+            UserMessage um = new UserMessage();
+            User u = new User();
+            u.setId(uid);
+            um.setUser(u);
+            um.setMessage(msg);
+            um.setRead(false);
+            um.setSend(false);
+            userMsgDao.add(um);
+        }
     }
 
     @Override
     public void add(Message msg, Attachment attachment) {
         List<Attachment> attachments = new ArrayList<>();
         attachments.add(attachment);
-        add(msg, attachments);
+//        add(msg, attachments);
     }
 
     @Override
@@ -55,7 +91,7 @@ public class MessageService implements IMessageService {
                 aids.add(a.getId());
                 System.out.println(a.getId());
             }
-            attachDao.deleteAttachments(aids);
+//            attachDao.deleteAttachments(aids);
         }
         msgDao.delete(id);
     }

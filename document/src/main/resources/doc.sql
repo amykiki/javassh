@@ -15,3 +15,8 @@ SELECT * FROM t_user t1
   RIGHT JOIN t_user t2 on td.scope_id = t2.dep_id
   LEFT JOIN t_dep tdep ON t2.dep_id = tdep.id
 WHERE t1.id = 1 ORDER BY td.scope_id ASC;
+
+SELECT * FROM t_user t1
+LEFT JOIN t_dep_scope td on t1.dep_id = td.depId
+  RIGHT JOIN t_user t2 on t2.dep_id = td.scope_id
+WHERE t1.id = 2 ORDER BY td.scope_id;
