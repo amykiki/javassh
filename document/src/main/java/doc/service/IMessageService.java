@@ -1,10 +1,12 @@
 package doc.service;
 
 import doc.dto.AttachDto;
+import doc.dto.Pager;
 import doc.entity.Attachment;
 import doc.entity.Message;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Amysue on 2016/5/13.
@@ -20,4 +22,10 @@ public interface IMessageService {
     public Message load(int id);
 
     public Message loadEagerById(int id);
+
+    public Pager<Message> findSendMsg(Map<String, Object> params, int pageOffset);
+
+    public Pager<Message> findReceiveMsg(Map<String, Object> params, int pageOffset);
+
+
 }

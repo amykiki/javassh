@@ -37,6 +37,7 @@ public class MessageAction extends ActionSupport {
     private File[]             atts;
     private String[]           attsContentType;
     private String[]           attsFileName;
+    private int pageOffset = 0;
 
     @Resource(name = "msgService")
     public void setMsgService(IMessageService msgService) {
@@ -101,6 +102,14 @@ public class MessageAction extends ActionSupport {
         this.attsFileName = attsFileName;
     }
 
+    public int getPageOffset() {
+        return pageOffset;
+    }
+
+    public void setPageOffset(int pageOffset) {
+        this.pageOffset = pageOffset;
+    }
+
     public String addInput() {
         System.out.println(ServletActionContext.getServletContext().getAttribute("javax.servlet.context.tempdir"));
         User       lguser = ActionUtil.getLguser();
@@ -129,7 +138,7 @@ public class MessageAction extends ActionSupport {
             } else {
                 List<Integer> allSendToIds = userService.listAllSendUsersId(ActionUtil.getLguser().getId());
                 sendToIdsInt = new ArrayList<>();
-                for (int i = 0; i <sendToIds.length; i++) {
+                for (int i = 0; i < sendToIds.length; i++) {
                     sendToIdsInt.add(sendToIds[i]);
                 }
                 sendToIdsInt.retainAll(allSendToIds);
@@ -162,11 +171,11 @@ public class MessageAction extends ActionSupport {
             Pattern p = Pattern.compile("Max size allowed is: (\\d[\\d,]*) but request was: (\\d[\\d,]*)");
             Matcher m = p.matcher(anErrorMessage);
             if (m.find()) {
-                String maxSizeStr = m.group(1);
+                String maxSizeStr    = m.group(1);
                 String uploadSizeStr = m.group(2);
                 maxSizeStr = maxSizeStr.replaceAll(",", "");
                 uploadSizeStr = uploadSizeStr.replaceAll(",", "");
-                long maxSize = Long.parseLong(maxSizeStr);
+                long maxSize    = Long.parseLong(maxSizeStr);
                 long uploadSize = Long.parseLong(uploadSizeStr);
                 System.out.println("maxSize = " + maxSize);
                 System.out.println("uploadSize = " + uploadSize);

@@ -94,4 +94,12 @@ public class ActionUtil {
         return PropertiesUtil.getParamsProp().getProperty(ATTACHPATH);
     }
 
+    public static boolean isNullStr(String string) {
+        if (string == null || string.trim().equals("")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

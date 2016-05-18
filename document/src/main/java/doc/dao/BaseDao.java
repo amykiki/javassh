@@ -104,6 +104,52 @@ public class BaseDao<T> implements IBaseDao<T>{
         query.setProjection(Projections.rowCount());
         List list = query.getExecutableCriteria(getSession()).list();
         int count = ((Long)list.get(0)).intValue();
+        Pager<T> pager = new Pager<>();
+        int offSet = getOffset(pageOffset, count, pager);
+
+        query.setProjection(null);
+        query.setResultTransformer(Criteria.ROOT_ENTITY);
+        if (associationPath != null) {
+            query.setFetchMode(associationPath, FetchMode.JOIN);
+        }
+        int pageSize = SystemContext.getPageSize();
+        List<T> data = query.getExecutableCriteria(getSession())
+                .setFirstResult(offSet)
+                .setMaxResults(pageSize)
+                .list();
+        pager.setDatas(data);
+        return pager;
+    }
+
+
+    @Override
+    public void executeHQL(String hql, Object... args) {
+        Query query = getHQL(hql, args);
+        query.executeUpdate();
+    }
+
+    @Override
+    public Object queryByHQL(String hql, Object... args) {
+        Query query = getHQL(hql, args);
+        return query.uniqueResult();
+    }
+
+    @Override
+    public List queryByCriteria(DetachedCriteria query) {
+        return query.getExecutableCriteria(getSession()).list();
+    }
+
+    private Query getHQL(String hql, Object... args) {
+        Query query = getSession().createQuery(hql);
+        if (args != null) {
+            for (int i = 0; i < args.length; i++) {
+                query.setParameter(i, args[i]);
+            }
+        }
+        return query;
+    }
+
+    protected int getOffset(int pageOffset, int count, Pager<T> pager) {
         int toPage = pageOffset;
         int pageSize = SystemContext.getPageSize();
         int pageRange = SystemContext.getPageRange();
@@ -139,53 +185,13 @@ public class BaseDao<T> implements IBaseDao<T>{
             }
             offSet = (toPage - 1) * pageSize;
         }
-
-        query.setProjection(null);
-        query.setResultTransformer(Criteria.ROOT_ENTITY);
-        if (associationPath != null) {
-            query.setFetchMode(associationPath, FetchMode.JOIN);
-        }
-        List<T> data = query.getExecutableCriteria(getSession())
-                .setFirstResult(offSet)
-                .setMaxResults(pageSize)
-                .list();
-        Pager<T> pager = new Pager<>();
         logger.info("toPage = " + toPage);
         pager.setToPage(toPage);
         pager.setPageSize(pageSize);
-        pager.setDatas(data);
         pager.setTotalRecords(count);
         pager.setBegin(begin);
         pager.setEnd(end);
         pager.setAllPageNums(allPageNums);
-        return pager;
-    }
-
-
-    @Override
-    public void executeHQL(String hql, Object... args) {
-        Query query = getHQL(hql, args);
-        query.executeUpdate();
-    }
-
-    @Override
-    public Object queryByHQL(String hql, Object... args) {
-        Query query = getHQL(hql, args);
-        return query.uniqueResult();
-    }
-
-    @Override
-    public List queryByCriteria(DetachedCriteria query) {
-        return query.getExecutableCriteria(getSession()).list();
-    }
-
-    private Query getHQL(String hql, Object... args) {
-        Query query = getSession().createQuery(hql);
-        if (args != null) {
-            for (int i = 0; i < args.length; i++) {
-                query.setParameter(i, args[i]);
-            }
-        }
-        return query;
+        return offSet;
     }
 }

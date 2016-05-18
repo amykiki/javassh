@@ -4,17 +4,17 @@ import doc.dao.IAttachmentDao;
 import doc.dao.IMessageDao;
 import doc.dao.IUserMessageDao;
 import doc.dto.AttachDto;
+import doc.dto.Pager;
 import doc.entity.Attachment;
 import doc.entity.Message;
 import doc.entity.User;
 import doc.entity.UserMessage;
 import doc.util.ActionUtil;
+import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Amysue on 2016/5/13.
@@ -105,5 +105,16 @@ public class MessageService implements IMessageService {
     @Override
     public Message loadEagerById(int id) {
         return msgDao.LoadEagerById(id);
+    }
+
+    @Override
+    public Pager<Message> findSendMsg(Map<String, Object> params, int pageOffset) {
+        Pager<Message> pager = msgDao.findSendMsg(params, pageOffset);
+        return pager;
+    }
+
+    @Override
+    public Pager<Message> findReceiveMsg(Map<String, Object> params, int pageOffset) {
+        return null;
     }
 }

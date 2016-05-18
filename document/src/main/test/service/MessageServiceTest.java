@@ -1,7 +1,9 @@
 package service;
 
+import doc.dto.SystemContext;
 import doc.entity.Attachment;
 import doc.entity.Message;
+import doc.entity.User;
 import doc.service.IAttachmentService;
 import doc.service.IMessageService;
 import org.junit.Test;
@@ -11,9 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Amysue on 2016/5/13.
@@ -66,5 +66,19 @@ public class MessageServiceTest {
     public void testLoad() throws Exception {
         Message m = msgService.load(5);
 
+    }
+
+    @Test
+    public void testFindSendMsg() throws Exception {
+        User u = new User();
+        u.setId(2);
+        SystemContext.setPageSize(15);
+        SystemContext.setPageRange(10);
+        SystemContext.setLguser(u);
+        Map<String, Object> params = new HashMap<>();
+        params.put("touser", "沈");
+        params.put("attach", ".jpg");
+        params.put("cons", "正文");
+        msgService.findSendMsg(params, 0);
     }
 }

@@ -1,6 +1,8 @@
 package doc.filter;
 
 import doc.dto.SystemContext;
+import doc.entity.User;
+import doc.util.ActionUtil;
 
 import javax.servlet.*;
 import java.io.IOException;
@@ -29,10 +31,15 @@ public class SystemContextFilter implements Filter {
          try {
              SystemContext.setPageSize(pageSize);
              SystemContext.setPageRange(pageRange);
+             User lguser = ActionUtil.getLguser();
+             if (lguser != null) {
+                 SystemContext.setLguser(lguser);
+             }
              filterChain.doFilter(servletRequest, servletResponse);
          } finally {
              SystemContext.removePageRange();
              SystemContext.RemovePageSize();
+             SystemContext.removeLguser();
          }
 
     }
