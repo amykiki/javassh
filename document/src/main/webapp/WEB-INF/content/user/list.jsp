@@ -163,7 +163,7 @@
                         </td>
                         <td>
                             <a href="/user_updateInput.action?uid=${id}">编辑</a>
-                            <a href="#" onclick="modifyUser(${id}, 'delete', '')">删除</a>
+                            <a href="#" onclick="modifyUser(${id}, 'deleted', '')">删除</a>
                         </td>
                     </tr>
                 </s:iterator>

@@ -1,9 +1,7 @@
 package doc.entity;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Amysue on 2016/5/13.
@@ -25,16 +23,22 @@ public class Message {
     @Column(name = "create_date")
     private Date createDate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User author;
+
+    @Column(name = "is_delete", nullable = false, columnDefinition = "tinyint default false")
+    private boolean deleted;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "t_msg_attach",
             joinColumns = @JoinColumn(name = "msg_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "attach_id", referencedColumnName = "id")
     )
-    private List<Attachment> attachments = new ArrayList<>();
+    private Set<Attachment> attachments = new LinkedHashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "message")
+    private Set<UserMessage> receives = new LinkedHashSet<>();
 
     public int getId() {
         return id;
@@ -44,11 +48,11 @@ public class Message {
         this.id = id;
     }
 
-    public List<Attachment> getAttachments() {
+    public Set<Attachment> getAttachments() {
         return attachments;
     }
 
-    public void setAttachments(List<Attachment> attachments) {
+    public void setAttachments(Set<Attachment> attachments) {
         this.attachments = attachments;
     }
 
@@ -82,5 +86,24 @@ public class Message {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public Set<UserMessage> getReceives() {
+        return receives;
+    }
+
+    public void setReceives(Set<UserMessage> receives) {
+        this.receives = receives;
+    }
+
+    public Message() {
     }
 }

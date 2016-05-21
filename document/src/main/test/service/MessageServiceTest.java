@@ -70,15 +70,51 @@ public class MessageServiceTest {
 
     @Test
     public void testFindSendMsg() throws Exception {
-        User u = new User();
-        u.setId(2);
         SystemContext.setPageSize(15);
         SystemContext.setPageRange(10);
-        SystemContext.setLguser(u);
+        User u = new User();
+        u.setId(176);
+//        u.setId(2);
+
+                            SystemContext.setLguser(u);
         Map<String, Object> params = new HashMap<>();
-        params.put("touser", "沈");
+//        params.put("touser", "沈");
+        params.put("fromuser", "无敌架构师");
         params.put("attach", ".jpg");
-        params.put("cons", "正文");
-        msgService.findSendMsg(params, 0);
+//        params.put("cons", "测试");
+//        msgService.findSendMsg(params, 0);
+//        msgService.findReceiveMsg(params, 0);
+    }
+
+    @Test
+    public void testLoadSend() throws Exception {
+
+        User lguser = new User();
+        lguser.setId(1);
+        SystemContext.setLguser(lguser);
+        Message m = msgService.loadSendMsg(3);
+        System.out.println(1);
+    }
+
+    @Test
+    public void testUpdateReceiveMsg() throws Exception {
+        User lguser = new User();
+        lguser.setId(2);
+        SystemContext.setLguser(lguser);
+        Message m = msgService.updateReceiveMsg(3);
+        System.out.println(m.getTitle());
+        System.out.println(m.getAuthor().getNickname());
+        System.out.println(m.getAttachments().size());
+        Iterator<Attachment> iter = m.getAttachments().iterator();
+        while (iter.hasNext()) {
+            System.out.println(iter.next().getOldName());
+        }
+        System.out.println(1);
+    }
+
+    @Test
+    public void testLoadEagerById() throws Exception {
+        Message m = msgService.loadEagerById(3);
+        System.out.println(1);
     }
 }

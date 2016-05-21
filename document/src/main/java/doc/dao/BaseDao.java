@@ -135,12 +135,28 @@ public class BaseDao<T> implements IBaseDao<T>{
     }
 
     @Override
+    public Object queryBySQL(String sql, Object... args) {
+        SQLQuery query = getSql(sql, args);
+        return query.uniqueResult();
+    }
+
+    @Override
     public List queryByCriteria(DetachedCriteria query) {
         return query.getExecutableCriteria(getSession()).list();
     }
 
     private Query getHQL(String hql, Object... args) {
         Query query = getSession().createQuery(hql);
+        if (args != null) {
+            for (int i = 0; i < args.length; i++) {
+                query.setParameter(i, args[i]);
+            }
+        }
+        return query;
+    }
+
+    private SQLQuery getSql(String sql, Object... args) {
+        SQLQuery query = getSession().createSQLQuery(sql);
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
                 query.setParameter(i, args[i]);

@@ -4,6 +4,7 @@ import doc.dto.AttachDto;
 import doc.dto.Pager;
 import doc.entity.Attachment;
 import doc.entity.Message;
+import doc.exception.DocException;
 
 import java.util.List;
 import java.util.Map;
@@ -27,5 +28,7 @@ public interface IMessageService {
 
     public Pager<Message> findReceiveMsg(Map<String, Object> params, int pageOffset);
 
+    public Message loadSendMsg(int id) throws DocException;
+    public Message updateReceiveMsg(int id) throws DocException;
 
 }

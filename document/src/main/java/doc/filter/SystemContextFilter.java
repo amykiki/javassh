@@ -31,10 +31,10 @@ public class SystemContextFilter implements Filter {
          try {
              SystemContext.setPageSize(pageSize);
              SystemContext.setPageRange(pageRange);
-             User lguser = ActionUtil.getLguser();
+             /*User lguser = ActionUtil.getLguser();
              if (lguser != null) {
                  SystemContext.setLguser(lguser);
-             }
+             }*/
              filterChain.doFilter(servletRequest, servletResponse);
          } finally {
              SystemContext.removePageRange();

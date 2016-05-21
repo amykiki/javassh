@@ -6,6 +6,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,12 +14,12 @@ import java.util.regex.Pattern;
  * Created by Amysue on 2016/5/6.
  */
 public class ActionUtil {
-    public final static String REDIRECT = "redirect";
-    public final static String FORWARD = "forward";
-    public final static String GERROR = "gerror";
-    public final static String LOGIN = "login";
-    public final static String AUTHINFO = "authinfo";
-    public final static String WELCOME = "welcome";
+    public final static  String REDIRECT   = "redirect";
+    public final static  String FORWARD    = "forward";
+    public final static  String GERROR     = "gerror";
+    public final static  String LOGIN      = "login";
+    public final static  String AUTHINFO   = "authinfo";
+    public final static  String WELCOME    = "welcome";
     private final static String ATTACHPATH = "attachpath";
 
     public static void setUrl(String url) {
@@ -47,7 +48,11 @@ public class ActionUtil {
     }
 
     public static User getLguser() {
-        return (User)ActionContext.getContext().getSession().get("lguser");
+        if (ActionContext.getContext().getSession().get("lguser") != null) {
+            return (User) ActionContext.getContext().getSession().get("lguser");
+        } else {
+            return null;
+        }
 
     }
 
@@ -56,7 +61,7 @@ public class ActionUtil {
     }
 
 
-    public static Object stringToObj(Class<?> clz, String s){
+    public static Object stringToObj(Class<?> clz, String s) {
 //        Department{id=2, name='教务处'}
         Pattern r = Pattern.compile(".*\\{(.*)}");
         Matcher m = r.matcher(s);
@@ -64,13 +69,13 @@ public class ActionUtil {
             s = m.group(1);
         }
         String[] sp = s.split(", ");
-        Object o = null;
+        Object   o  = null;
         try {
             o = clz.getConstructor().newInstance();
             for (String p : sp) {
-                String[] maps = p.split("=");
-                String fieldName = maps[0];
-                String fieldValue = maps[1];
+                String[] maps       = p.split("=");
+                String   fieldName  = maps[0];
+                String   fieldValue = maps[1];
                 BeanUtils.setProperty(o, fieldName, fieldValue);
             }
         } catch (InstantiationException e) {
@@ -100,6 +105,26 @@ public class ActionUtil {
         } else {
             return false;
         }
+    }
+
+    public static String getMapValStr(Map<String, Object> param, String key) {
+        if (param.get(key) != null) {
+            return param.get(key).toString();
+        } else {
+            return null;
+        }
+    }
+
+    public static Map<String, Object> getActionParams(Map<String, Object> params) {
+        for (String key : params.keySet()) {
+            if (params.get(key) != null) {
+                Object[] values = (Object[]) params.get(key);
+                if (values.length == 1) {
+                    params.put(key, values[0]);
+                }
+            }
+        }
+        return params;
     }
 
 }

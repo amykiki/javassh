@@ -8,11 +8,11 @@ import javax.persistence.*;
 @Entity
 @Table(name = "t_user_msg")
 public class UserMessage {
-    private int id;
-    private User user;
+    private int     id;
+    private User    user;
     private Message message;
     private boolean read;
-    private boolean send;
+    private boolean deleted;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +34,9 @@ public class UserMessage {
         this.user = user;
     }
 
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "m_id")
+    @JoinColumn(name = "m_id", nullable = false)
     public Message getMessage() {
         return message;
     }
@@ -53,12 +54,12 @@ public class UserMessage {
         this.read = read;
     }
 
-    @Column(name = "is_send", nullable = false, columnDefinition = "tinyint default false")
-    public boolean isSend() {
-        return send;
+    @Column(name = "is_delete", nullable = false, columnDefinition = "tinyint default false")
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setSend(boolean send) {
-        this.send = send;
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

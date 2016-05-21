@@ -28,6 +28,7 @@ public interface IBaseDao<T> {
     public void executeHQL(String hql, Object... args);
 
     public Object queryByHQL(String hql, Object... args);
+    public Object queryBySQL(String sql, Object... args);
 
     public List queryByCriteria(DetachedCriteria query);
 

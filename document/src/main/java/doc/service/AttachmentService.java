@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Amysue on 2016/5/13.
@@ -29,11 +26,11 @@ public class AttachmentService implements IAttachmentService {
     }
 
     @Override
-    public List<Attachment> add(AttachDto attachDto) {
-        File[]   atts            = attachDto.getAtts();
-        String[] attsFileName    = attachDto.getAttsFileName();
-        String[] attsContentType = attachDto.getAttsContentType();
-        List<Attachment> attsList = new ArrayList<>();
+    public Set<Attachment> add(AttachDto attachDto) {
+        File[]          atts            = attachDto.getAtts();
+        String[]        attsFileName    = attachDto.getAttsFileName();
+        String[]        attsContentType = attachDto.getAttsContentType();
+        Set<Attachment> attsSet        = new LinkedHashSet<>();
         for (int i = 0; i < atts.length; i++) {
             Attachment attachment = new Attachment();
             String oldName = attsFileName[i];
@@ -44,19 +41,21 @@ public class AttachmentService implements IAttachmentService {
             attachment.setCreateDate(new Date());
             attachment.setSize(atts[i].length());
             attachDao.add(attachment);
-            attsList.add(attachment);
+            attsSet.add(attachment);
         }
 //        上传文件
+        Attachment[] attsArr = new Attachment[attsSet.size()];
+        attsSet.toArray(attsArr);
         for (int i = 0; i < atts.length; i++) {
             File fn = atts[i];
-            String uploadPath = ActionUtil.getAttachPath() + "/" + attsList.get(i).getNewName();
+            String uploadPath = ActionUtil.getAttachPath() + "/" + attsArr[i].getNewName();
             try {
                 FileUtils.copyFile(fn, new File(uploadPath));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return attsList;
+        return attsSet;
     }
 
     private String getNewName(String oldName) {

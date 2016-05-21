@@ -4,10 +4,12 @@ import doc.dto.Pager;
 import doc.dto.SystemContext;
 import doc.entity.Message;
 import doc.entity.User;
+import doc.entity.UserMessage;
 import doc.util.ActionUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.*;
+import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.springframework.stereotype.Repository;
@@ -31,6 +33,35 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
     }
 
     @Override
+    public Message loadSend(int id) {
+        return loadMsg(id);
+    }
+
+    private Message loadMsg(int id) {
+        String sql = "SELECT msg.*, author.*, adep.*, attach.*, mattach.*, um.*, ruser.*, rdep.* FROM t_msg as msg " +
+                "INNER JOIN t_user as author on msg.author_id = author.id " +
+                "INNER JOIN t_dep as adep on author.dep_id = adep.id " +
+                "LEFT JOIN t_msg_attach mattach on msg.id = mattach.msg_id " +
+                "LEFT JOIN t_attach as attach on mattach.attach_id = attach.id " +
+                "LEFT JOIN t_user_msg as um on msg.id = um.m_id " +
+                "LEFT JOIN t_user as ruser on um.u_id = ruser.id " +
+                "LEFT JOIN t_dep AS rdep on ruser.dep_id = rdep.id " +
+                "where msg.id = :id";
+        List list = getSession().createSQLQuery(sql)
+                .addEntity("msg", Message.class)
+                .addJoin("author", "msg.author")
+                .addJoin("attach", "msg.attachments")
+                .addJoin("um", "msg.receives")
+                .addEntity("msg", Message.class)
+                .setResultTransformer(Criteria.ROOT_ENTITY)
+                .setParameter("id", id)
+                .list();
+        System.out.println(1);
+        Message m = (Message) list.get(0);
+        return m;
+
+    }
+    @Override
     public List findByCriteria(DetachedCriteria query) {
         Query         query2 = getSession().createQuery("select msg from Message as msg left join fetch msg.attachments");
         List<Message> mlists = query2.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
@@ -39,19 +70,146 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
 
     @Override
     public Pager<Message> findSendMsg(Map<String, Object> params, int pageOffset) {
-        String       select      = "select DISTINCT m.id, m.title, m.create_date as createDate from t_msg as m";
-        Pager<Message> pager = findMsg(params, pageOffset, select);
-        return null;
+        return findMsg(params, pageOffset, "send");
     }
 
     @Override
     public Pager<Message> findReceiveMsg(Map<String, Object> params, int pageOffset) {
-        String select = "select DISTINCT m.id, m.title, m.create_date as createDate, u1.id as uid, u1.nickname from t_msg as m";
-        Pager<Message> pager = findMsg(params, pageOffset, select);
+        return findMsg(params, pageOffset, "receive");
+    }
+
+    private Pager<Message> findMsg(Map<String, Object> params, int pageOffset, String type) {
+        String fromuser = ActionUtil.getMapValStr(params, "fromuser");
+        String touser   = ActionUtil.getMapValStr(params, "touser");
+        String cons     = ActionUtil.getMapValStr(params, "cons");
+        String attach   = ActionUtil.getMapValStr(params, "attach");
+        String read     = ActionUtil.getMapValStr(params, "read");
+        DetachedCriteria query = DetachedCriteria.forClass(Message.class, "msg");
+
+        if (type.equals("receive") || !ActionUtil.isNullStr(touser)) {
+            query.createAlias("msg.receives", "um", JoinType.INNER_JOIN)
+                    .createAlias("msg.author", "fromuser", JoinType.INNER_JOIN);
+        }
+        if (!ActionUtil.isNullStr(fromuser)) {
+            if (type.equals("send")) {
+                query.add(Restrictions.eq("msg.deleted", false))
+                        .add(Restrictions.eq("msg.author.id", Integer.parseInt(fromuser)));
+            } else {
+                query.add(Restrictions.like("fromuser.nikcname", "%" + fromuser + "%"));
+            }
+        }
+        if (!ActionUtil.isNullStr(touser)) {
+            if (type.equals("send")) {
+                query.createAlias("um.user", "touser", JoinType.INNER_JOIN)
+                        .add(Restrictions.like("touser.nickname", "%" + touser + "%"));
+            } else {
+                query.add(Restrictions.eq("um.deleted", false))
+                        .add(Restrictions.eq("um.user.id", Integer.parseInt(touser)));
+            }
+        }
+        if (!ActionUtil.isNullStr(cons)) {
+            query.add(Restrictions.disjunction()
+                              .add(Restrictions.like("msg.content", "%" + cons + "%"))
+                              .add(Restrictions.like("msg.title", "%" + cons + "%"))
+            );
+        }
+        if (!ActionUtil.isNullStr(attach)) {
+            query.createAlias("msg.attachments", "atts", JoinType.LEFT_OUTER_JOIN)
+                    .add(Restrictions.like("atts.oldName", "%" + attach + "%"));
+        }
+        if (type.equals("receive") && !ActionUtil.isNullStr(read)) {
+            boolean isRead = Boolean.parseBoolean(read);
+            query.add(Restrictions.eq("um.read", isRead));
+        }
+
+        Pager<Message> pager    = new Pager<>();
+        int            pageSize = SystemContext.getPageSize();
+        // get all number
+        query.setProjection(Projections.countDistinct("msg.id"));
+        int count  = ((Long) query.getExecutableCriteria(getSession()).uniqueResult()).intValue();
+        int offSet = getOffset(pageOffset, count, pager);
+
+        query.setProjection(null);
+        ProjectionList projList = Projections.projectionList();
+        projList.add(Projections.distinct(Projections.property("msg.title")), "title");
+        projList.add(Projections.property("msg.createDate"), "createDate");
+        projList.add(Projections.property("msg.id"), "id");
+        if (type.equals("receive")) {
+            projList.add(Projections.property("fromuser.nickname"), "nickname");
+            projList.add(Projections.property("fromuser.id"), "uid");
+        }
+        query.setProjection(projList);
+        query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        query.addOrder(Order.desc("msg.createDate"));
+        List results = query.getExecutableCriteria(getSession())
+                .setFirstResult(offSet).setMaxResults(pageSize).list();
+        List<Message> data = new ArrayList<>();
+        for (int i = 0; i < results.size(); i++) {
+            Map<String, Object> map = (Map) results.get(i);
+            Message             msg = new Message();
+            msg.setTitle((String) map.get("title"));
+            msg.setId((int) map.get("id"));
+            msg.setCreateDate((Date) map.get("createDate"));
+            if (type.equals("receive")) {
+                User u = new User();
+                u.setNickname((String) map.get("nickname"));
+                u.setId((int) map.get("uid"));
+                msg.setAuthor(u);
+            }
+            data.add(msg);
+        }
+        pager.setDatas(data);
+        return pager;
+    }
+
+    private Pager<Message> findMsg2(Map<String, Object> params, int pageOffset) {
+        ProjectionList projList = Projections.projectionList();
+        projList.add(Projections.distinct(Projections.property("msg.title")), "title");
+        projList.add(Projections.property("msg.createDate"), "createDate");
+        projList.add(Projections.property("msg.id"), "id");
+        projList.add(Projections.property("msg.author"), "author");
+        DetachedCriteria query = DetachedCriteria.forClass(UserMessage.class)
+                .createAlias("message", "msg", JoinType.INNER_JOIN)
+                .createAlias("user", "tu", JoinType.INNER_JOIN)
+                .createAlias("msg.author", "msg.author", JoinType.INNER_JOIN)
+                .createAlias("msg.attachments", "atts", JoinType.LEFT_OUTER_JOIN)
+                /*.setFetchMode("msg", FetchMode.JOIN)
+                .setFetchMode("tu", FetchMode.JOIN)
+                .setFetchMode("msg.author", FetchMode.JOIN)
+                .setFetchMode("atts", FetchMode.JOIN)*/
+                .setProjection(projList)
+                .add(Restrictions.eq("send", false))
+                .add(Restrictions.eq("tu.id", 176))
+                .add(Restrictions.disjunction()
+                             .add(Restrictions.like("msg.content", "%标题%"))
+                             .add(Restrictions.like("msg.title", "%标题%"))
+                )
+//                .add(Restrictions.like("atts.oldName", "%.jpg%"))
+//                .add(Restrictions.like("su.nickname", "%无敌%"))
+//                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+//                .setResultTransformer(Transformers.aliasToBean(Message.class))
+                .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+                .addOrder(Order.desc("msg.createDate"));
+        List list = query.getExecutableCriteria(getSession()).list();
+/*
+        for (int i = 0; i < list.size(); i++) {
+            Message msg = (Message) list.get(i);
+            System.out.println(msg.getId() + "----------" + msg.getTitle());
+            System.out.println("user id -----" + msg.getAuthor().getId() + "-------user nickname" +  msg.getAuthor().getNickname());
+
+        }*/
+       /* for (int i = 0; i < list.size(); i++) {
+            UserMessage um = (UserMessage) list.get(i);
+            Message msg = um.getMessage();
+            System.out.println(msg.getId() + "----------" + msg.getTitle());
+            System.out.println("user nickname" + um.getMessage().getAuthor().getNickname());
+
+        }*/
+
         return null;
     }
 
-    public Pager<Message> findMsg(Map<String, Object> params, int pageOffset, String select) {
+    private Pager<Message> findMsgSQL(Map<String, Object> params, int pageOffset, String select) {
         List<String> whereClause = new ArrayList<>();
         String       where       = "";
         String       type        = (String) params.get("type");
@@ -60,6 +218,7 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
         String       cons        = (String) params.get("cons");
         String       attach      = (String) params.get("attach");
 
+        // 发信人检索
         if (!ActionUtil.isNullStr(fromuser)) {
             select += " INNER JOIN t_user u1 on m.author_id = u1.id";
             if (type.equalsIgnoreCase("send")) {
@@ -71,7 +230,7 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
                 whereClause.add(where);
             }
         }
-
+        // 收信人检索
         if (!ActionUtil.isNullStr(touser)) {
             select += " inner join t_user_msg um1 on m.id = um1.m_id and um1.is_send = 0";
             if (type.equalsIgnoreCase("send")) {
@@ -84,7 +243,7 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
                 params.put("touser", "eq:" + touser);
             }
         }
-
+        // 附件检索
         if (!ActionUtil.isNullStr(attach)) {
             select += " inner join t_msg_attach ma1 on m.id = ma1.msg_id" +
                     " inner join t_attach ta1 on ma1.attach_id = ta1.id";
@@ -93,6 +252,7 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
         } else {
             params.remove("attach");
         }
+        // 信息标题内容检索
         if (!ActionUtil.isNullStr(cons)) {
             where = " and (m.title like :cons or m.content like :cons)";
             whereClause.add(where);
@@ -145,18 +305,20 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
             data = query.setResultTransformer(Transformers.aliasToBean(Message.class))
                     .list();
 
-        } else {
+        }
+        // receive需要列出发信人，所有现在我只能想到这个办法，没有更好的办法了
+        else {
             List list = query.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
-                 .list();
+                    .list();
             for (int i = 0; i < list.size(); i++) {
-                Map<String, Object> map = (Map)list.get(i);
-                Message msg = new Message();
+                Map<String, Object> map = (Map) list.get(i);
+                Message             msg = new Message();
                 msg.setTitle((String) map.get("title"));
-                msg.setId((int)map.get("id"));
-                msg.setCreateDate((Date)map.get("createDate"));
+                msg.setId((int) map.get("id"));
+                msg.setCreateDate((Date) map.get("createDate"));
                 User u = new User();
                 u.setNickname((String) map.get("nickname"));
-                u.setId((int)map.get("uid"));
+                u.setId((int) map.get("uid"));
                 msg.setAuthor(u);
                 data.add(msg);
             }
@@ -164,4 +326,6 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
         pager.setDatas(data);
         return pager;
     }
+
+
 }

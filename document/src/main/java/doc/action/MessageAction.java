@@ -3,9 +3,11 @@ package doc.action;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
 import doc.dto.AttachDto;
+import doc.dto.Pager;
 import doc.entity.Attachment;
 import doc.entity.Message;
 import doc.entity.User;
+import doc.exception.DocException;
 import doc.service.IAttachmentService;
 import doc.service.IMessageService;
 import doc.service.IUserService;
@@ -17,7 +19,9 @@ import org.springframework.stereotype.Controller;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,17 +31,19 @@ import java.util.regex.Pattern;
 @Controller("msgAction")
 @Scope("prototype")
 public class MessageAction extends ActionSupport {
-    private IMessageService    msgService;
-    private IAttachmentService attachService;
-    private IUserService       userService;
-    private Message            cMsg;
-    private int[]              sendToIds;
-    private List<Integer>      sendToIdsInt;
-    private Attachment         cAttach;
-    private File[]             atts;
-    private String[]           attsContentType;
-    private String[]           attsFileName;
+    private IMessageService     msgService;
+    private IAttachmentService  attachService;
+    private IUserService        userService;
+    private Message             cMsg;
+    private int mid;
+    private int[]               sendToIds;
+    private List<Integer>       sendToIdsInt;
+    private Attachment          cAttach;
+    private Map<String, Object> findParams = new HashMap<>();
     private int pageOffset = 0;
+    private File[]              atts;
+    private String[]            attsContentType;
+    private String[]            attsFileName;
 
     @Resource(name = "msgService")
     public void setMsgService(IMessageService msgService) {
@@ -102,6 +108,14 @@ public class MessageAction extends ActionSupport {
         this.attsFileName = attsFileName;
     }
 
+    public int getMid() {
+        return mid;
+    }
+
+    public void setMid(int mid) {
+        this.mid = mid;
+    }
+
     public int getPageOffset() {
         return pageOffset;
     }
@@ -109,6 +123,15 @@ public class MessageAction extends ActionSupport {
     public void setPageOffset(int pageOffset) {
         this.pageOffset = pageOffset;
     }
+
+    public Map<String, Object> getFindParams() {
+        return findParams;
+    }
+
+    public void setFindParams(Map<String, Object> findParams) {
+        this.findParams = findParams;
+    }
+
 
     public String addInput() {
         System.out.println(ServletActionContext.getServletContext().getAttribute("javax.servlet.context.tempdir"));
@@ -157,11 +180,32 @@ public class MessageAction extends ActionSupport {
     }
 
     public String listSend() {
+        ActionUtil.getActionParams(findParams);
+        Pager<Message> pager = msgService.findSendMsg(findParams, pageOffset);
+        ActionContext.getContext().put("mpager", pager);
         return SUCCESS;
+    }
+
+    public String loadSend() {
+        try {
+            cMsg = msgService.loadSendMsg(mid);
+        } catch (DocException e) {
+            addActionError(e.getMessage());
+            return ActionUtil.GERROR;
+        }
+        ActionUtil.setUrl("msg/showMsg.jsp");
+        return ActionUtil.FORWARD;
     }
 
     public String listReceive() {
         return SUCCESS;
+    }
+
+    public String deleteSend() {
+        msgService.delete(mid);
+        listSend();
+        ActionUtil.setUrl("msg/listSend.jsp");
+        return ActionUtil.FORWARD;
     }
 
     @Override

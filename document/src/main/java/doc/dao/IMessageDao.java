@@ -14,6 +14,8 @@ public interface IMessageDao extends IBaseDao<Message>{
     public Message LoadEagerById(int id);
     public List findByCriteria(DetachedCriteria query);
 
+    public Message loadSend(int id);
+
     public Pager<Message> findSendMsg(Map<String, Object> params, int pageOffset);
     public Pager<Message> findReceiveMsg(Map<String, Object> params, int pageOffset);
 }
