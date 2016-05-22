@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository("userMsgDao")
 public class UserMessageDao extends BaseDao<UserMessage> implements IUserMessageDao {
+
 }

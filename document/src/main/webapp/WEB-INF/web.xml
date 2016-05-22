@@ -58,7 +58,7 @@ http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
         <filter-class>doc.filter.SystemContextFilter</filter-class>
         <init-param>
             <param-name>pageSize</param-name>
-            <param-value>15</param-value>
+            <param-value>5</param-value>
         </init-param>
         <init-param>
             <param-name>pageRange</param-name>

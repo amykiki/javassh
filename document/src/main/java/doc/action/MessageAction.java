@@ -40,10 +40,17 @@ public class MessageAction extends ActionSupport {
     private List<Integer>       sendToIdsInt;
     private Attachment          cAttach;
     private Map<String, Object> findParams = new HashMap<>();
+    private Map<String, String> readParams = new HashMap<>();
+    {
+        readParams.put("all", "所有邮件");
+        readParams.put("true", "已读邮件");
+        readParams.put("false", "未读邮件");
+    }
     private int pageOffset = 0;
     private File[]              atts;
     private String[]            attsContentType;
     private String[]            attsFileName;
+    private int pageSize = 0;
 
     @Resource(name = "msgService")
     public void setMsgService(IMessageService msgService) {
@@ -124,6 +131,14 @@ public class MessageAction extends ActionSupport {
         this.pageOffset = pageOffset;
     }
 
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
     public Map<String, Object> getFindParams() {
         return findParams;
     }
@@ -132,6 +147,13 @@ public class MessageAction extends ActionSupport {
         this.findParams = findParams;
     }
 
+    public Map<String, String> getReadParams() {
+        return readParams;
+    }
+
+    public void setReadParams(Map<String, String> readParams) {
+        this.readParams = readParams;
+    }
 
     public String addInput() {
         System.out.println(ServletActionContext.getServletContext().getAttribute("javax.servlet.context.tempdir"));
@@ -189,6 +211,7 @@ public class MessageAction extends ActionSupport {
     public String loadSend() {
         try {
             cMsg = msgService.loadSendMsg(mid);
+            ActionContext.getContext().put("type", "send");
         } catch (DocException e) {
             addActionError(e.getMessage());
             return ActionUtil.GERROR;
@@ -198,13 +221,38 @@ public class MessageAction extends ActionSupport {
     }
 
     public String listReceive() {
+        if (findParams.get("read") == null) {
+            findParams.put("read", "all");
+        }
+        ActionUtil.getActionParams(findParams);
+        Pager<Message> pager = msgService.findReceiveMsg(findParams, pageOffset);
+        ActionContext.getContext().put("mpager", pager);
         return SUCCESS;
+    }
+
+    public String loadReceive() {
+        try {
+            cMsg = msgService.updateReceiveMsg(mid);
+            ActionContext.getContext().put("type", "receive");
+        } catch (DocException e) {
+            addActionError(e.getMessage());
+            return ActionUtil.GERROR;
+        }
+        ActionUtil.setUrl("msg/showMsg.jsp");
+        return ActionUtil.FORWARD;
     }
 
     public String deleteSend() {
         msgService.delete(mid);
         listSend();
         ActionUtil.setUrl("msg/listSend.jsp");
+        return ActionUtil.FORWARD;
+    }
+
+    public String deleteReceive() {
+        msgService.deleteReceive(mid);
+        listReceive();
+        ActionUtil.setUrl("msg/listReceive.jsp");
         return ActionUtil.FORWARD;
     }
 

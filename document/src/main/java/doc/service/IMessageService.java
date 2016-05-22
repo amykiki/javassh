@@ -4,6 +4,7 @@ import doc.dto.AttachDto;
 import doc.dto.Pager;
 import doc.entity.Attachment;
 import doc.entity.Message;
+import doc.entity.UserMessage;
 import doc.exception.DocException;
 
 import java.util.List;
@@ -20,7 +21,11 @@ public interface IMessageService {
 
     public void delete(int id);
 
+    public void deleteReceive(int id);
+
     public Message load(int id);
+
+    public UserMessage loadByMsgId(int mid);
 
     public Message loadEagerById(int id);
 

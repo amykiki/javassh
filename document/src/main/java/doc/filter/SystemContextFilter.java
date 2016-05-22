@@ -5,6 +5,7 @@ import doc.entity.User;
 import doc.util.ActionUtil;
 
 import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
@@ -22,19 +23,22 @@ public class SystemContextFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-       /* int pageOffset = 0;
-        try {
-            pageOffset = Integer.parseInt(servletRequest.getParameter("pageOffset"));
+        /*try {
+            int tPageSize = Integer.parseInt(servletRequest.getParameter("pageSize"));
+            if (tPageSize > 0) {
+                pageSize = tPageSize;
+            }
         } catch (NumberFormatException e) {
 
         }*/
          try {
              SystemContext.setPageSize(pageSize);
              SystemContext.setPageRange(pageRange);
-             /*User lguser = ActionUtil.getLguser();
+             HttpServletRequest hreq = (HttpServletRequest)servletRequest;
+             User lguser = (User)hreq.getSession().getAttribute("lguser");
              if (lguser != null) {
                  SystemContext.setLguser(lguser);
-             }*/
+             }
              filterChain.doFilter(servletRequest, servletResponse);
          } finally {
              SystemContext.removePageRange();

@@ -86,9 +86,25 @@ public class MessageService implements IMessageService {
     }
 
     @Override
+    public void deleteReceive(int id) {
+        UserMessage um = loadByMsgId(id);
+        if (um != null) {
+            um.setDeleted(true);
+        }
+    }
+
+    @Override
     public Message load(int id) {
         Message m = msgDao.load(id);
         return m;
+    }
+
+    @Override
+    public UserMessage loadByMsgId(int mid) {
+        User lguser = SystemContext.getLguser();
+        String hql = "select um from UserMessage um where um.message.id = ? and user.id = ?";
+        UserMessage um = (UserMessage)userMsgDao.queryByHQL(hql, mid, lguser.getId());
+        return um;
     }
 
     @Override
@@ -133,7 +149,7 @@ public class MessageService implements IMessageService {
 
     @Override
     public Message updateReceiveMsg(int id) throws DocException {
-        User lguser = SystemContext.getLguser();
+        User lguser = ActionUtil.getLguser();
         Message m;
         String hql = "select um from UserMessage um where um.message.id = ? and um.user.id = ? and deleted = false";
         UserMessage um = (UserMessage)msgDao.queryByHQL(hql, id, lguser.getId());

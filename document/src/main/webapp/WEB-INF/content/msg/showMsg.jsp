@@ -42,27 +42,39 @@
             <div class="title">
                 <strong><s:text name="cMsg.title"/></strong>
             </div>
-            <div class="sendtousers">
-                <span>收信人:</span>
-                <s:iterator value="cMsg.receives" status="rowStatus">
+            <s:if test="%{#type == 'send'}">
+                <div class="sendtousers">
+                    <span>收信人:</span>
+                    <s:iterator value="cMsg.receives" status="rowStatus">
                     <span>
                         <s:property value="user.nickname"/>
                         [<s:property value="user.dep.name"/>]
                         <s:if test="!#rowStatus.last">, </s:if>
                     </span>
-                </s:iterator>
-            </div>
-            <div>
-                <span>附件</span>
-                
-            </div>
+                    </s:iterator>
+                </div>
+            </s:if>
+            <s:else>
+                <div class="sendtousers">
+                    <span>发信人:</span>
+                    <span>${cMsg.author.nickname}[${cMsg.author.dep.name}]</span>
+                </div>
+            </s:else>
+            <s:if test="cMsg.attachments.size() > 0">
+                <div>
+                    <span>附件</span>
+                    <s:iterator value="cMsg.attachments">
+                        [<a href="<%=request.getContextPath()%>/upload/attachments/${newName}"><s:property value="oldName"/></a>]
+                        &nbsp;
+                    </s:iterator>
+                </div>
+            </s:if>
             <div class="content">
                 <s:textarea name="cMsg.content" id="mytextarea" disabled="true"/>
                 <script>
                     CKEDITOR.replace('mytextarea');
                 </script>
             </div>
-                <%--<s:debug/>--%>
         </fieldset>
     </s:form>
 </div>

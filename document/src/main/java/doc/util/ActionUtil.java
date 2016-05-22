@@ -118,9 +118,11 @@ public class ActionUtil {
     public static Map<String, Object> getActionParams(Map<String, Object> params) {
         for (String key : params.keySet()) {
             if (params.get(key) != null) {
-                Object[] values = (Object[]) params.get(key);
-                if (values.length == 1) {
-                    params.put(key, values[0]);
+                if (params.get(key) instanceof Object[]) {
+                    Object[] values = (Object[]) params.get(key);
+                    if (values.length == 1) {
+                        params.put(key, values[0]);
+                    }
                 }
             }
         }

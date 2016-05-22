@@ -2,6 +2,7 @@ package doc.dao;
 
 import doc.dto.Pager;
 import doc.dto.SystemContext;
+import doc.entity.Department;
 import doc.entity.Message;
 import doc.entity.User;
 import doc.entity.UserMessage;
@@ -14,10 +15,7 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Amysue on 2016/5/13.
@@ -61,6 +59,7 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
         return m;
 
     }
+
     @Override
     public List findByCriteria(DetachedCriteria query) {
         Query         query2 = getSession().createQuery("select msg from Message as msg left join fetch msg.attachments");
@@ -79,28 +78,30 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
     }
 
     private Pager<Message> findMsg(Map<String, Object> params, int pageOffset, String type) {
-        String fromuser = ActionUtil.getMapValStr(params, "fromuser");
-        String touser   = ActionUtil.getMapValStr(params, "touser");
-        String cons     = ActionUtil.getMapValStr(params, "cons");
-        String attach   = ActionUtil.getMapValStr(params, "attach");
-        String read     = ActionUtil.getMapValStr(params, "read");
-        DetachedCriteria query = DetachedCriteria.forClass(Message.class, "msg");
+        String           fromuser = ActionUtil.getMapValStr(params, "fromuser");
+        String           touser   = ActionUtil.getMapValStr(params, "touser");
+        String           cons     = ActionUtil.getMapValStr(params, "cons");
+        String           attach   = ActionUtil.getMapValStr(params, "attach");
+        String           read     = ActionUtil.getMapValStr(params, "read");
+        DetachedCriteria query    = DetachedCriteria.forClass(Message.class, "msg");
 
-        if (type.equals("receive") || !ActionUtil.isNullStr(touser)) {
+        if (type.equals("receive")) {
             query.createAlias("msg.receives", "um", JoinType.INNER_JOIN)
-                    .createAlias("msg.author", "fromuser", JoinType.INNER_JOIN);
+                    .createAlias("msg.author", "fromuser", JoinType.INNER_JOIN)
+                    .createAlias("fromuser.dep", "dep", JoinType.INNER_JOIN);
         }
         if (!ActionUtil.isNullStr(fromuser)) {
             if (type.equals("send")) {
                 query.add(Restrictions.eq("msg.deleted", false))
                         .add(Restrictions.eq("msg.author.id", Integer.parseInt(fromuser)));
             } else {
-                query.add(Restrictions.like("fromuser.nikcname", "%" + fromuser + "%"));
+                query.add(Restrictions.like("fromuser.nickname", "%" + fromuser + "%"));
             }
         }
         if (!ActionUtil.isNullStr(touser)) {
             if (type.equals("send")) {
-                query.createAlias("um.user", "touser", JoinType.INNER_JOIN)
+                query.createAlias("msg.receives", "um", JoinType.INNER_JOIN)
+                        .createAlias("um.user", "touser", JoinType.INNER_JOIN)
                         .add(Restrictions.like("touser.nickname", "%" + touser + "%"));
             } else {
                 query.add(Restrictions.eq("um.deleted", false))
@@ -117,9 +118,14 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
             query.createAlias("msg.attachments", "atts", JoinType.LEFT_OUTER_JOIN)
                     .add(Restrictions.like("atts.oldName", "%" + attach + "%"));
         }
-        if (type.equals("receive") && !ActionUtil.isNullStr(read)) {
-            boolean isRead = Boolean.parseBoolean(read);
-            query.add(Restrictions.eq("um.read", isRead));
+        if (type.equals("receive") && !ActionUtil.isNullStr(read) && !read.equals("all")) {
+            boolean isRead = false;
+            try {
+                isRead = Boolean.parseBoolean(read);
+                query.add(Restrictions.eq("um.read", isRead));
+            } catch (Exception e) {
+                // e.printStackTrace();
+            }
         }
 
         Pager<Message> pager    = new Pager<>();
@@ -137,6 +143,8 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
         if (type.equals("receive")) {
             projList.add(Projections.property("fromuser.nickname"), "nickname");
             projList.add(Projections.property("fromuser.id"), "uid");
+            projList.add(Projections.property("dep.name"), "depname");
+            projList.add(Projections.property("um.read"), "read");
         }
         query.setProjection(projList);
         query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
@@ -151,10 +159,18 @@ public class MessageDao extends BaseDao<Message> implements IMessageDao {
             msg.setId((int) map.get("id"));
             msg.setCreateDate((Date) map.get("createDate"));
             if (type.equals("receive")) {
+                UserMessage um = new UserMessage();
+                um.setRead((Boolean) map.get("read"));
+                Set<UserMessage> ums = new LinkedHashSet<>();
+                ums.add(um);
+                Department dep = new Department();
+                dep.setName((String)map.get("depname"));
                 User u = new User();
+                u.setDep(dep);
                 u.setNickname((String) map.get("nickname"));
                 u.setId((int) map.get("uid"));
                 msg.setAuthor(u);
+                msg.setReceives(ums);
             }
             data.add(msg);
         }
