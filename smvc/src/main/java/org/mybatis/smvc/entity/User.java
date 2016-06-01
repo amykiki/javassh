@@ -4,10 +4,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.mybatis.smvc.enums.Role;
-import org.mybatis.smvc.validators.Add;
-import org.mybatis.smvc.validators.Forbidden;
-import org.mybatis.smvc.validators.Update;
-import org.mybatis.smvc.validators.UpdatePwd;
+import org.mybatis.smvc.validators.*;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
@@ -38,7 +35,7 @@ public class User implements Serializable {
     @NotEmpty(message = "邮箱不能为空",groups = {Add.class, Update.class} )
     @Email(message = "邮箱格式不正确", groups = {Add.class, Update.class})
     private String     email;
-//    @Min(value = 1, message = "请选择部门", groups = {Add.class, Update.class})
+    @ValidUserDep(groups = {Add.class, Update.class})
     private Department dep;
 
     public int getId() {
