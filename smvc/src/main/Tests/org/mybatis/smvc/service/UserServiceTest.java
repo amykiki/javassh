@@ -111,10 +111,11 @@ public class UserServiceTest {
     public void testLoadByParam() throws Exception {
 //        User u = userService.loadByParam(493);
         List<String> cols = new ArrayList<>();
-        cols.add("username");
+       /* cols.add("username");
         cols.add("nickname");
-        cols.add("email");
+        cols.add("email");*/
         cols.add("id");
+        cols.add("password");
         User u = userService.loadByParam(2, cols);
         System.out.println(u);
 

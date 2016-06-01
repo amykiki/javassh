@@ -35,6 +35,7 @@ public class User implements Serializable {
     @NotEmpty(message = "邮箱不能为空",groups = {Add.class, Update.class} )
     @Email(message = "邮箱格式不正确", groups = {Add.class, Update.class})
     private String     email;
+
     @ValidUserDep(groups = {Add.class, Update.class})
     private Department dep;
 

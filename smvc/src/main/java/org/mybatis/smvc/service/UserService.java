@@ -1,6 +1,5 @@
 package org.mybatis.smvc.service;
 
-import org.apache.ibatis.annotations.Param;
 import org.mybatis.smvc.entity.Department;
 import org.mybatis.smvc.entity.User;
 import org.mybatis.smvc.exception.SmvcException;
@@ -75,5 +74,20 @@ public class UserService {
     }
     public User loadByParam(int id, List<String> cols) {
         return userMapper.loadByParam(id, cols);
+    }
+
+    public void updatePwd(int id, String oldPwd, String newPwd) throws SmvcException{
+        User u = userMapper.loadLazy(id);
+        if (u == null) {
+            throw new SmvcException("用户不存在");
+        }
+        if (!u.getPassword().equals(oldPwd)) {
+            throw new SmvcException("旧密码不正确");
+        }
+
+        User nu = new User();
+        nu.setId(u.getId());
+        nu.setPassword(newPwd);
+        userMapper.update(nu);
     }
 }

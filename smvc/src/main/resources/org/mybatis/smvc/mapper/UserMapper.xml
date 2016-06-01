@@ -39,7 +39,28 @@
     </select>
 
     <update id="update" parameterType="User">
-        UPDATE t_user SET
+        UPDATE t_user
+        <set>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="nickname != null">
+                nickname = #{nickname},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="role != null">
+                role = #{role},
+            </if>
+            <if test="dep != null">
+                dep_id = #{dep.id},
+            </if>
+        </set>
+        where id = #{id}
     </update>
 
     <resultMap id="userMap" type="User" autoMapping="false">
