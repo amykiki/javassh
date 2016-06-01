@@ -15,7 +15,8 @@ public class Message implements Serializable{
     private Date createDate;
     private User author;
     private boolean deleted;
-    private List<Attachment> attachments = new ArrayList<>();
+//    private List<Attachment> attachments = new ArrayList<>();
+    private List<Attachment> attachments;
     private List<UserMessage> receives    = new ArrayList<>();
 
     public List<UserMessage> getReceives() {
@@ -80,5 +81,17 @@ public class Message implements Serializable{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", createDate=" + createDate +
+                ", author=" + author +
+                ", deleted=" + deleted +
+                ", content='" + content + '\'' +
+                '}';
     }
 }

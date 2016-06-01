@@ -1,7 +1,18 @@
 package org.mybatis.smvc.entity;
 
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.mybatis.smvc.enums.Role;
+import org.mybatis.smvc.validators.Add;
+import org.mybatis.smvc.validators.Forbidden;
+import org.mybatis.smvc.validators.Update;
+import org.mybatis.smvc.validators.UpdatePwd;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 /**
@@ -10,11 +21,24 @@ import java.io.Serializable;
 public class User implements Serializable {
     private static final long serialVersionUID = 2879893054128289558L;
     private int        id;
-    private String     username;
+
+    @Length(min = 5, max = 10, message = "用户名长度必须在5-10之间")
+    @Pattern(regexp = "[a-zA-Z]{4}[a-zA-Z0-9]{1,6}", message = "用户名前四位必须为字母，只能包含字母和数字", groups = {Add.class, UpdatePwd.class})
+    private String username;
+
+    @Length(min = 4, max = 10, message = "密码长度必须在4-10之间", groups = {Add.class, UpdatePwd.class})
     private String     password;
+
+    @NotEmpty(message = "昵称不能为空", groups = {Add.class, Update.class})
+    @Forbidden(value = {"admin", "管理员"}, groups = {Add.class, Update.class})
     private String     nickname;
+
     private Role       role;
+
+    @NotEmpty(message = "邮箱不能为空",groups = {Add.class, Update.class} )
+    @Email(message = "邮箱格式不正确", groups = {Add.class, Update.class})
     private String     email;
+//    @Min(value = 1, message = "请选择部门", groups = {Add.class, Update.class})
     private Department dep;
 
     public int getId() {
@@ -71,5 +95,18 @@ public class User implements Serializable {
 
     public void setDep(Department dep) {
         this.dep = dep;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", role=" + role +
+                ", email='" + email + '\'' +
+                ", dep=" + dep +
+                '}';
     }
 }

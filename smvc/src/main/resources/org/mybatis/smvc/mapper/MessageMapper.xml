@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.smvc.mapper.MessageMapper">
+    <resultMap id="msgMap" type="Message">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="deleted" column="is_delete"/>
+        <result property="content" column="content"/>
+        <association property="author" resultMap="org.mybatis.smvc.mapper.UserMapper.userMap" columnPrefix="au_"/>
+        <collection property="attachments" ofType="Attachment" resultMap="attMap" columnPrefix="att_"/>
+    </resultMap>
+    <resultMap id="attMap" type="Attachment">
+        <id property="id" column="id"/>
+        <result property="newName" column="new_name"/>
+        <result property="oldName" column="old_name"/>
+        <result property="contentType" column="content_type"/>
+        <result property="size" column="size"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="type" column="type"/>
+    </resultMap>
+    <select id="load" parameterType="int" resultMap="msgMap">
+        SELECT
+        m.*,
+        au.id AS au_id, au.username as au_username,
+        au.nickname as au_nickname, au.password AS au_password,
+        au.email as au_email, au.role as au_role,
+        ad.id as au_dep_id, ad.name as au_dep_name,
+        att.id as att_id, att.new_name as att_new_name,
+        att.old_name as att_old_name, att.content_type as att_content_type,
+        att.create_date as att_create_date, att.size as att_size, att.type as att_type
+        FROM t_msg m
+        LEFT JOIN t_user au ON m.author_id = au.id
+        LEFT JOIN t_dep ad ON au.dep_id = ad.id
+        LEFT JOIN t_msg_attach ma ON m.id = ma.msg_id
+        LEFT JOIN t_attach att on ma.attach_id = att.id
+        WHERE m.id = #{id}
+    </select>
+
+    <resultMap id="msgList" type="Message" autoMapping="false">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="deleted" column="is_delete"/>
+    </resultMap>
+
+    <select id="findSend" resultMap="msgList">
+        SELECT * FROM t_msg
+        <where>
+            <!--<choose>
+                <when test="msg.delete != null">
+                    is_delete = #{msg.delete}
+                </when>
+                <otherwise>
+                    is_delete = 0
+                </otherwise>
+            </choose>-->
+            <if test="msg.delete != null">
+                is_delete = #{msg.delete}
+            </if>
+            <if test="msg.author != null and msg.author.id != null">
+                and author_id = #{msg.author.id}
+            </if>
+            <if test="msg.cons != null and msg.cons != ''">
+                AND (title LIKE concat('%', #{msg.cons}, '%') or content LIKE concat('%', #{msg.cons}, '%'))
+            </if>
+        </where>
+        order by create_date desc
+    </select>
+</mapper>

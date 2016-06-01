@@ -6,7 +6,109 @@
 <mapper namespace="org.mybatis.smvc.mapper.UserMapper">
 
     <insert id="add" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO t_user
-        VALUES (NULL, #{username}, #{password}, #{nickname}, #{role}, #{email}, #{dep.id})
+        INSERT INTO t_user(username, password, nickname, role, email, dep_id)
+        VALUES (#{username}, #{password}, #{nickname}, #{role}, #{email}, #{dep.id})
     </insert>
+
+    <insert id="addUsers"  useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO t_user (email, nickname, password, role, username, dep_id) VALUES
+        <foreach item="item" collection="list" separator=",">
+            (#{item.email}, #{item.nickname}, #{item.password}, #{item.role}, #{item.username}, #{item.dep.id})
+        </foreach>
+    </insert>
+
+    <insert id="addByMap">
+        INSERT INTO t_user(username, role, dep_id)
+        VALUES (#{umap.username}, #{umap.role}, #{umap.dep.id})
+    </insert>
+
+    <select id="findByMap" resultType="User">
+        SELECT * FROM t_user LEFT JOIN t_dep d ON dep_id = d.id
+        <where>
+            <if test="umap.username != null and umap.username != ''">
+                username like concat('%', #{umap.username}, '%')
+            </if>
+            <if test="umap.role != null">
+                and role = #{umap.role}
+            </if>
+            <if test="umap.dep.name != null and umap.dep.name != ''">
+                and d.name like concat('%', #{umap.dep.name}, '%')
+            </if>
+        </where>
+    </select>
+
+    <update id="update" parameterType="User">
+        UPDATE t_user SET
+    </update>
+
+    <resultMap id="userMap" type="User" autoMapping="false">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="nickname" column="nickname"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="role" column="role"/>
+        <association property="dep" javaType="Department">
+            <id property="id" column="dep_id"/>
+            <result property="name" column="dep_name"/>
+        </association>
+    </resultMap>
+    <resultMap id="userMapLazy" type="User" autoMapping="false">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="nickname" column="nickname"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="role" column="role"/>
+        <association property="dep" javaType="Department">
+            <id property="id" column="dep_id"/>
+        </association>
+    </resultMap>
+    <select id="listAllSendUsers" parameterType="int" resultMap="userMap">
+        SELECT u1.*, d1.id AS dep_id, d1.name AS dep_name
+        FROM t_user ou
+        LEFT JOIN t_dep_scope ds ON ou.dep_id = ds.depId
+        LEFT JOIN t_user u1 ON u1.dep_id = ds.scope_id
+        LEFT JOIN t_dep d1 ON u1.dep_id = d1.id
+        WHERE ou.id = #{uId}
+        order by u1.dep_id asc
+    </select>
+
+    <select id="list" resultType="User">
+        SELECT * FROM t_user limit 10
+    </select>
+
+
+    <!--动态控制查询的column-->
+    <sql id="userColumns">
+        ${col1}, ${col2}, ${col3}
+    </sql>
+    <sql id="userColumn">
+        ${tb}.${col}
+    </sql>
+    <select id="loadByParam" resultType="User" parameterType="java.util.List">
+        SELECT 
+        <foreach collection="list" item="item" separator=",">
+            <include refid="userColumn">
+                <property name="tb" value="u1"/>
+                <property name="col" value="${item}"/>
+            </include>
+        </foreach>
+        FROM t_user u1
+        WHERE u1.id = #{id}
+    </select>
+    <select id="loadLazy" resultMap="userMapLazy">
+        SELECT * FROM t_user WHERE id = #{id}
+    </select>
+    <select id="LoadEager" resultMap="userMap">
+        SELECT u1.*, dep.id as dep_id, dep.name as dep_name
+        FROM t_user u1
+        LEFT JOIN t_dep dep ON u1.dep_id = dep.id
+        WHERE u1.id = #{id}
+    </select>
+    <select id="countId" resultType="int">
+        SELECT COUNT(id) FROM t_user WHERE username = #{username}
+    </select>
+
 </mapper>

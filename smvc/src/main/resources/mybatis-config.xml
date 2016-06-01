@@ -7,7 +7,7 @@
         <setting name="logImpl" value="LOG4J2"/>
     </settings>
     <typeHandlers>
-        <typeHandler handler="org.mybatis.smvc.handler.RoleHandler"
+        <typeHandler  handler="org.mybatis.smvc.handler.RoleHandler"
                      javaType="org.mybatis.smvc.enums.Role"/>
     </typeHandlers>
 </configuration>

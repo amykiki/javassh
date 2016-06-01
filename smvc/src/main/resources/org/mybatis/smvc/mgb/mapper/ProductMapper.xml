@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.smvc.mgb.mapper.ProductMapper">
+  <resultMap id="BaseResultMap" type="org.mybatis.smvc.mgb.entity.Product">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="img" jdbcType="VARCHAR" property="img" />
+    <result column="stock" jdbcType="INTEGER" property="stock" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="sales" jdbcType="INTEGER" property="sales" />
+    <result column="c_id" jdbcType="INTEGER" property="cId" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="org.mybatis.smvc.mgb.entity.Product">
+    <result column="intro" jdbcType="LONGVARCHAR" property="intro" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, price, img, stock, status, sales, c_id
+  </sql>
+  <sql id="Blob_Column_List">
+    intro
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from t_product
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_product
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="org.mybatis.smvc.mgb.entity.Product">
+    insert into t_product (id, name, price, 
+      img, stock, status, 
+      sales, c_id, intro
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, 
+      #{img,jdbcType=VARCHAR}, #{stock,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{sales,jdbcType=INTEGER}, #{cId,jdbcType=INTEGER}, #{intro,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="org.mybatis.smvc.mgb.entity.Product">
+    insert into t_product
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="img != null">
+        img,
+      </if>
+      <if test="stock != null">
+        stock,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="sales != null">
+        sales,
+      </if>
+      <if test="cId != null">
+        c_id,
+      </if>
+      <if test="intro != null">
+        intro,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="img != null">
+        #{img,jdbcType=VARCHAR},
+      </if>
+      <if test="stock != null">
+        #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="sales != null">
+        #{sales,jdbcType=INTEGER},
+      </if>
+      <if test="cId != null">
+        #{cId,jdbcType=INTEGER},
+      </if>
+      <if test="intro != null">
+        #{intro,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.mybatis.smvc.mgb.entity.Product">
+    update t_product
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="img != null">
+        img = #{img,jdbcType=VARCHAR},
+      </if>
+      <if test="stock != null">
+        stock = #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="sales != null">
+        sales = #{sales,jdbcType=INTEGER},
+      </if>
+      <if test="cId != null">
+        c_id = #{cId,jdbcType=INTEGER},
+      </if>
+      <if test="intro != null">
+        intro = #{intro,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="org.mybatis.smvc.mgb.entity.Product">
+    update t_product
+    set name = #{name,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+      img = #{img,jdbcType=VARCHAR},
+      stock = #{stock,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      sales = #{sales,jdbcType=INTEGER},
+      c_id = #{cId,jdbcType=INTEGER},
+      intro = #{intro,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.mybatis.smvc.mgb.entity.Product">
+    update t_product
+    set name = #{name,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+      img = #{img,jdbcType=VARCHAR},
+      stock = #{stock,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      sales = #{sales,jdbcType=INTEGER},
+      c_id = #{cId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

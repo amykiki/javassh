@@ -2,6 +2,46 @@
  "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
-<web-app>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
   <display-name>Archetype Created Web Application</display-name>
+  <servlet>
+    <servlet-name>smvc</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+  </servlet>
+    <servlet-mapping>
+        <servlet-name>smvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!--创建Spring监听器
+    在web项目中使用Sping，applicationContext.xml配置文件中没用BeanFactory，要想在业务层
+    class文件中直接引用Spring容器管理的bean可以通过配置ContextLoaderListener监听器
+    -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!--Spring的监听器可以通过配置上下文参数来获取配置文件
+    如果在web.xml中没有参数配置信息，默认路径是是"/WEB-INF/applicationContext.xml"
+    在WEB-INF目录下创建的Spring配置文件名称必须是applicationContext.xml
+    如果要自定义文件名，可以加入contextConfigLocation这个context上下文参数
+    如果有多个配置文件，可以写在一起，以","隔开或者也可以使用类似applicationContext-*.xml采用通配符方式
+    -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath*:beans.xml</param-value>
+    </context-param>
 </web-app>
