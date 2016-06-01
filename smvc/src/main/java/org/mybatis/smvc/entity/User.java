@@ -19,7 +19,6 @@ public class User implements Serializable {
     private static final long serialVersionUID = 2879893054128289558L;
     private int        id;
 
-    @Length(min = 5, max = 10, message = "用户名长度必须在5-10之间")
     @Pattern(regexp = "[a-zA-Z]{4}[a-zA-Z0-9]{1,6}", message = "用户名前四位必须为字母，只能包含字母和数字", groups = {Add.class, UpdatePwd.class})
     private String username;
 
