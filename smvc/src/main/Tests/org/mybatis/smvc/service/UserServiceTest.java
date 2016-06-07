@@ -115,8 +115,8 @@ public class UserServiceTest {
         cols.add("nickname");
         cols.add("email");*/
         cols.add("id");
-        cols.add("password");
-        User u = userService.loadByParam(2, cols);
+        cols.add("role");
+        User u = userService.loadByParam(1, cols);
         System.out.println(u);
 
     }

@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import org.mybatis.smvc.entity.Department;
 import org.mybatis.smvc.entity.User;
 import org.mybatis.smvc.entity.UserFind;
+import org.mybatis.smvc.enums.Role;
 import org.mybatis.smvc.exception.SmvcException;
 import org.mybatis.smvc.mapper.DepMapper;
 import org.mybatis.smvc.mapper.UserMapper;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -106,5 +108,11 @@ public class UserService {
         nu.setId(u.getId());
         nu.setPassword(newPwd);
         userMapper.update(nu);
+    }
+
+    public User updateRole(User user) {
+        userMapper.update(user);
+        user = userMapper.LoadEager(user.getId());
+        return user;
     }
 }

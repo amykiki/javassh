@@ -58,6 +58,28 @@
             width: 50px;
         }
     </style>
+    <script type="text/javascript">
+        function changeRole(id, node) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/user/list", true);
+            xhttp.onreadystatechange = function() {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    var ustr = xhttp.responseText;
+                    var user = JSON.parse(ustr);
+                    if (user.role == 'NORMAL') {
+                        node.innerText = '普通用户';
+                        node.className = "";
+                    } else {
+                        node.innerText = '管理员';
+                        node.className = "redColor";
+                    }
+                }
+            };
+            xhttp.setRequestHeader("Accept", "application/json");
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send("id=" + id + "&rolevalue="+node.innerText);
+        }
+    </script>
 </head>
 <body>
 <div id="formwrapper">
@@ -109,10 +131,10 @@
                         <td>${luser.nickname}</td>
                         <td>${luser.email}</td>
                         <c:if test="${luser.role.toString() == 'ADMIN'}">
-                            <td><a href="#"class="redColor">管理员</a></td>
+                            <td><a href="javascript:void(0)"class="redColor" onclick="changeRole(${luser.id}, this);">管理员</a></td>
                         </c:if>
                         <c:if test="${luser.role.toString() == 'NORMAL'}">
-                            <td><a href="#">普通用户</a></td>
+                            <td><a href="javascript:void(0)" onclick="changeRole(${luser.id}, this);">普通用户</a></td>
                         </c:if>
                         <td>
                                 ${luser.dep.name}

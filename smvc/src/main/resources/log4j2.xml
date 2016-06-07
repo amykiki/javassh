@@ -12,6 +12,9 @@
         <logger name="org.mybatis.spring.transaction" level="debug" additivity="false">
             <appender-ref ref = "Console"/>
         </logger>
+        <logger name="org.springframework.jdbc" level="debug" additivity="false">
+            <appender-ref ref = "Console"/>
+        </logger>
         <logger name="org.mybatis.spring" level="info" additivity="false">
             <appender-ref ref = "Console"/>
         </logger>

@@ -33,4 +33,6 @@ public interface UserMapper {
     public User LoadEager(int id);
 
     public int countId(String username);
+
+
 }

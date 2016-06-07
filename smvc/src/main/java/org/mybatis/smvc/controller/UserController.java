@@ -1,6 +1,7 @@
 package org.mybatis.smvc.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.validator.constraints.Length;
@@ -16,6 +17,7 @@ import org.mybatis.smvc.validators.Add;
 import org.mybatis.smvc.validators.CheckPassword;
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -204,6 +206,22 @@ public class UserController {
         PageInfo<User> pager = userService.findByPager(uf);
         model.addAttribute("pager", pager);
         return uf;
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public String updateRole(@RequestParam("id") int id, @RequestParam("rolevalue") String rolevalue) {
+        User user = new User();
+        user.setId(id);
+        if (rolevalue.equals("管理员")) {
+            user.setRole(Role.NORMAL);
+        } else {
+            user.setRole(Role.ADMIN);
+        }
+        User u = userService.updateRole(user);
+        Gson gson = new Gson();
+        String uJson = gson.toJson(u);
+        return uJson;
     }
 
 }

@@ -108,7 +108,7 @@
     <sql id="userColumn">
         ${tb}.${col}
     </sql>
-    <select id="loadByParam" resultType="User" parameterType="java.util.List">
+    <select id="loadByParam" resultType="User">
         SELECT 
         <foreach collection="list" item="item" separator=",">
             <include refid="userColumn">
