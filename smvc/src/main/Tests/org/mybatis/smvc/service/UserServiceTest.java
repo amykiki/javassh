@@ -100,7 +100,7 @@ public class UserServiceTest {
     @Test
     public void testFindByMap() throws Exception {
         Map<String, Object> umap = new HashedMap();
-        umap.put("username", "amy");
+//        umap.put("username", "amy");
         umap.put("dep", new Department("办公室"));
 //        umap.put("role", Role.NORMAL);
         List<User> data = userService.findByMap(umap);

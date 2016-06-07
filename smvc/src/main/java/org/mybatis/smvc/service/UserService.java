@@ -1,11 +1,15 @@
 package org.mybatis.smvc.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.mybatis.smvc.entity.Department;
 import org.mybatis.smvc.entity.User;
+import org.mybatis.smvc.entity.UserFind;
 import org.mybatis.smvc.exception.SmvcException;
 import org.mybatis.smvc.mapper.DepMapper;
 import org.mybatis.smvc.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,9 +22,11 @@ import java.util.Map;
 @Service("userService")
 public class UserService {
     @Autowired
-    private UserMapper userMapper;
+    private UserMapper                     userMapper;
     @Autowired
-    private DepMapper depMapper;
+    private DepMapper                      depMapper;
+    private @Value("${user.pageSize}") int pageSize;
+    private @Value("${user.navPages}") int navPages;
 
     public void add(User user) throws SmvcException{
         Department dep = depMapper.load(user.getDep().getId());
@@ -58,7 +64,18 @@ public class UserService {
     }
 
     public List<User> findByMap(Map<String, Object> umap) {
-        return userMapper.findByMap(umap);
+        PageHelper.startPage(2, 15);
+        List<User> data = userMapper.findByMap(umap);
+        PageInfo page = new PageInfo(data);
+        return data;
+    }
+
+    public PageInfo<User> findByPager(UserFind userFind) {
+        System.out.println("pageSize = " + pageSize);
+        PageHelper.startPage(userFind.getPageNum(), pageSize);
+        List<User> data = userMapper.findByPager(userFind);
+        PageInfo pager = new PageInfo(data, navPages);
+        return pager;
     }
 
     public List<User> listAllSendUsers(int uId) {

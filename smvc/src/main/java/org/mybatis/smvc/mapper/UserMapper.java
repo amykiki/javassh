@@ -2,6 +2,7 @@ package org.mybatis.smvc.mapper;
 
 import org.apache.ibatis.annotations.Param;
 import org.mybatis.smvc.entity.User;
+import org.mybatis.smvc.entity.UserFind;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ public interface UserMapper {
     public void addByMap(@Param("umap") Map<String, Object> umap);
 
     public List<User> findByMap(@Param("umap") Map<String, Object> umap);
+    public List<User> findByPager(UserFind uf);
     public void update(User user);
 
     public List<User> listAllSendUsers(int uId);

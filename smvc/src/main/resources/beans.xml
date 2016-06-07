@@ -16,7 +16,14 @@
     <context:component-scan base-package="org.mybatis.smvc.service"/>
     <!--属性占位符 PropertyPlaceholderConfigurer-->
     <context:property-placeholder location="classpath:jdbc.properties" ignore-unresolvable="true"/>
-
+    <context:property-placeholder location="classpath:app.properties" ignore-unresolvable="true"/>
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="formatters">
+            <set>
+                <bean class="org.mybatis.smvc.formatter.PhoneNumFormatAnnotationFormatterFactory"/>
+            </set>
+        </property>
+    </bean>
     <!--配置数据源Data Source Configuration-->
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${mysql.driver}"/>

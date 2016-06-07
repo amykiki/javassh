@@ -10,4 +10,11 @@
         <typeHandler  handler="org.mybatis.smvc.handler.RoleHandler"
                      javaType="org.mybatis.smvc.enums.Role"/>
     </typeHandlers>
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageHelper">
+            <property name="dialect" value="mysql"/>
+            <property name="reasonable" value="true"/>
+            <property name="supportMethodsArguments" value="true"/>
+        </plugin>
+    </plugins>
 </configuration>

@@ -19,20 +19,20 @@ public class User implements Serializable {
     private static final long serialVersionUID = 2879893054128289558L;
     private int        id;
 
-    @Pattern(regexp = "[a-zA-Z]{4}[a-zA-Z0-9]{1,6}", message = "用户名前四位必须为字母，只能包含字母和数字", groups = {Add.class, UpdatePwd.class})
+    @Pattern(regexp = "[a-zA-Z]{4}[a-zA-Z0-9]{1,6}", message="{user.username.illegal}", groups = {Add.class, UpdatePwd.class})
     private String username;
 
-    @Length(min = 4, max = 10, message = "密码长度必须在4-10之间", groups = {Add.class, UpdatePwd.class})
+    @Length(min = 4, max = 10, message = "{user.password.length}", groups = {Add.class, UpdatePwd.class})
     private String     password;
 
-    @NotEmpty(message = "昵称不能为空", groups = {Add.class, Update.class})
+    @NotEmpty(message = "{user.nickname.empty}", groups = {Add.class, Update.class})
     @Forbidden(value = {"admin", "管理员"}, groups = {Add.class, Update.class})
     private String     nickname;
 
     private Role       role;
 
-    @NotEmpty(message = "邮箱不能为空",groups = {Add.class, Update.class} )
-    @Email(message = "邮箱格式不正确", groups = {Add.class, Update.class})
+    @NotEmpty(message = "{user.email.empty}",groups = {Add.class, Update.class} )
+    @Email(message = "{user.email.illegal}", groups = {Add.class, Update.class})
     private String     email;
 
     @ValidUserDep(groups = {Add.class, Update.class})

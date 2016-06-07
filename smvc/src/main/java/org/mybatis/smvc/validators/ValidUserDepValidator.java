@@ -11,7 +11,6 @@ import javax.validation.ConstraintValidatorContext;
 public class ValidUserDepValidator implements ConstraintValidator<ValidUserDep, Department>{
     @Override
     public void initialize(ValidUserDep validUserDep) {
-
     }
 
     @Override

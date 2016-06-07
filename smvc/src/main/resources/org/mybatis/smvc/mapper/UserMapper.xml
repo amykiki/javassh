@@ -131,5 +131,24 @@
     <select id="countId" resultType="int">
         SELECT COUNT(id) FROM t_user WHERE username = #{username}
     </select>
+    <select id="findByPager" resultMap="userMap">
+        SELECT u1.*, dep.id AS dep_id, dep.name AS dep_name
+        FROM t_user u1
+        LEFT JOIN t_dep dep ON u1.dep_id = dep.id
+        <where>
+            <if test="username != null and username != ''">
+                username like concat('%', #{username}, '%')
+            </if>
+            <if test="nickname != null and nickname != ''">
+                and nickname like concat('%', #{nickname}, '%')
+            </if>
+            <if test="role != null and role.toString() != 'ALL'">
+                and role = #{role}
+            </if>
+            <if test="depname != null and depname != ''">
+                and dep.name like concat('%', #{depname}, '%')
+            </if>
+        </where>
+    </select>
 
 </mapper>
