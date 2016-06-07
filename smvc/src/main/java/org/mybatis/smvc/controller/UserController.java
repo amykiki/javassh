@@ -186,24 +186,30 @@ public class UserController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public String list(Model model) {
-        listModel(null, model);
+        listModel(null, 1, model);
         return "user/list";
     }
 
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public String list(@Validated UserFind uf, BindingResult br, Model model) {
-        listModel(uf, model);
+    @RequestMapping(value = "/list/{pageNum}", method = RequestMethod.GET)
+    public String list(@PathVariable int pageNum, Model model) {
+        listModel(null, pageNum, model);
         return "user/list";
     }
 
-    private UserFind listModel(UserFind uf, Model model) {
+    @RequestMapping(value = "/list/{pageNum}", method = RequestMethod.POST)
+    public String list(@PathVariable int pageNum, @Validated UserFind uf, BindingResult br, Model model) {
+        listModel(uf, pageNum, model);
+        return "user/list";
+    }
+
+    private UserFind listModel(UserFind uf, int pageNum, Model model) {
         if (uf == null) {
             uf = new UserFind();
             uf.setRole(Role.ALL);
         }
         model.addAttribute("uf", uf);
         model.addAttribute("roles", Role.values());
-        PageInfo<User> pager = userService.findByPager(uf);
+        PageInfo<User> pager = userService.findByPager(uf, pageNum);
         model.addAttribute("pager", pager);
         return uf;
     }

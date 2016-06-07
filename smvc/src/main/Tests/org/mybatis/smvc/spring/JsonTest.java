@@ -37,7 +37,7 @@ public class JsonTest {
     @Test
     public void testListJson() {
         UserFind uf = new UserFind();
-        PageInfo<User> pages = userService.findByPager(uf);
+        PageInfo<User> pages = userService.findByPager(uf, 1);
         List<User> users = pages.getList();
         Gson gson2 = new GsonBuilder().setPrettyPrinting().create();
         String ujson = gson2.toJson(users);

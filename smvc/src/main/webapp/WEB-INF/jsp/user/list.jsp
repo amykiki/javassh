@@ -83,7 +83,7 @@
 </head>
 <body>
 <div id="formwrapper">
-    <sf:form id="uForm" action="/user/list" modelAttribute="uf" method="post">
+    <sf:form id="uForm" action="/user/list/1" modelAttribute="uf" method="post">
         <fieldset>
             <legend>用户查询</legend>
             <div class="radio-div">

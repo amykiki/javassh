@@ -72,9 +72,9 @@ public class UserService {
         return data;
     }
 
-    public PageInfo<User> findByPager(UserFind userFind) {
+    public PageInfo<User> findByPager(UserFind userFind, int pageNum) {
         System.out.println("pageSize = " + pageSize);
-        PageHelper.startPage(userFind.getPageNum(), pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         List<User> data = userMapper.findByPager(userFind);
         PageInfo pager = new PageInfo(data, navPages);
         return pager;

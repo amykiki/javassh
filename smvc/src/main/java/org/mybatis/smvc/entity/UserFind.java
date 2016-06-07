@@ -13,11 +13,6 @@ public class UserFind {
     private String depname;
     @NotNull
     private Role role;
-    private int pageNum;
-
-    public UserFind() {
-        this.pageNum = 1;
-    }
 
     public String getUsername() {
         return username;
@@ -51,11 +46,4 @@ public class UserFind {
         this.role = role;
     }
 
-    public int getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
-    }
 }
