@@ -42,10 +42,10 @@
     </tr>
     <tr>
         <td>用户权限</td>
-        <c:if test="#user.role.toString() == 'ADMIN'">
+        <c:if test="${user.role.toString() == 'ADMIN'}">
             <td>管理员</td>
         </c:if>
-        <c:if test="#user.role.toString() == 'NORMAL'">
+        <c:if test="${user.role.toString() == 'NORMAL'}">
             <td>普通用户</td>
         </c:if>
 

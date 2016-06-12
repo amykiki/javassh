@@ -6,6 +6,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.util.SavedRequest;
+import org.apache.shiro.web.util.WebUtils;
 import org.mybatis.smvc.entity.User;
 import org.mybatis.smvc.service.UserService;
 import org.mybatis.smvc.validators.UpdatePwd;
@@ -54,7 +56,13 @@ public class AuthController {
         }
         User lguser = userService.loadByUsername(user.getUsername());
         subject.getSession().setAttribute("lguser", lguser);
-        return "home";
+        SavedRequest req = WebUtils.getSavedRequest(null);
+        if (req != null) {
+            String url = req.getRequestUrl();
+            return "redirect:"+url;
+        } else {
+            return "home";
+        }
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
