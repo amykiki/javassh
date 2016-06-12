@@ -5,7 +5,6 @@ import com.github.pagehelper.PageInfo;
 import org.mybatis.smvc.entity.Department;
 import org.mybatis.smvc.entity.User;
 import org.mybatis.smvc.entity.UserFind;
-import org.mybatis.smvc.enums.Role;
 import org.mybatis.smvc.exception.SmvcException;
 import org.mybatis.smvc.mapper.DepMapper;
 import org.mybatis.smvc.mapper.UserMapper;
@@ -93,6 +92,14 @@ public class UserService {
     }
     public User loadByParam(int id, List<String> cols) {
         return userMapper.loadByParam(id, cols);
+    }
+
+    public User loadByUsername(String username) {
+        return userMapper.loadByUsername(username);
+    }
+
+    public User loadByParamUsername(String username, String... params) {
+        return userMapper.loadByParamUsername(username, Arrays.asList(params));
     }
 
     public void updatePwd(int id, String oldPwd, String newPwd) throws SmvcException{

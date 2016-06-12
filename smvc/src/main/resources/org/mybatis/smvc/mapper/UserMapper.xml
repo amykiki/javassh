@@ -150,5 +150,22 @@
             </if>
         </where>
     </select>
+    <select id="loadByUsername" resultMap="userMap">
+        SELECT u1.*, dep.id as dep_id, dep.name as dep_name
+        FROM t_user u1
+        LEFT JOIN t_dep dep ON u1.dep_id = dep.id
+        WHERE u1.username = #{username}
+    </select>
+    <select id="loadByParamUsername" resultType="User">
+        SELECT
+        <foreach collection="list" item="item" separator=",">
+            <include refid="userColumn">
+                <property name="tb" value="u1"/>
+                <property name="col" value="${item}"/>
+            </include>
+        </foreach>
+        FROM t_user u1
+        WHERE u1.username = #{username}
+    </select>
 
 </mapper>

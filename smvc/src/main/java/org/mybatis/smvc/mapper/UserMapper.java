@@ -32,6 +32,9 @@ public interface UserMapper {
 
     public User LoadEager(int id);
 
+    public User loadByUsername(String username);
+    public User loadByParamUsername(@Param("username") String username, @Param("list") List<String> list);
+
     public int countId(String username);
 
 
