@@ -38,6 +38,7 @@
     </bean>
 
     <!--将静态文件集中到某个特殊文件夹处理-->
+    <mvc:resources mapping="/js/**" location="/resources/js/"/>
     <mvc:resources mapping="/resources/**" location="/resources/"/>
     <context:component-scan base-package="org.mybatis.smvc.controller"/>
 
@@ -70,7 +71,33 @@
         <property name="prefix" value="/WEB-INF/jsp/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
+    <mvc:view-controller path="/home" view-name="home"/>
+    <mvc:view-controller path="/unauthorized" view-name="unauthorized"/>
 
+    <!--shiro 配置-->
+    <bean id="userRealm" class="org.mybatis.smvc.realm.userRealm"/>
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+        <property name="globalSessionTimeout" value="1800000"/>
+    </bean>
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="userRealm"/>
+        <!--Use Shiro Native Session Management-->
+        <property name="sessionManager" ref="sessionManager"/>
+    </bean>
+
+
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/login"/>
+        <property name="successUrl" value="/home"/>
+        <property name="unauthorizedUrl" value="/unauthorized"/>
+        <property name="filterChainDefinitions">
+            <value>
+                /login=anon
+            </value>
+        </property>
+    </bean>
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
     <!--设置multipartResover才能上传文件-->
      <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
          <property name="maxUploadSize" value="10485760"/>
@@ -79,7 +106,7 @@
     <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
         <property name="exceptionMappings">
             <props>
-                <prop key="org.springframework.jdbc.*Exception">error</prop>
+                <prop key="java.lang.Throwable">error</prop>
             </props>
         </property>
     </bean>
