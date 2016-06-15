@@ -1,5 +1,6 @@
 package com.github.amysue.shiro.chapter3;
 
+import com.github.amysue.shiro.BaseTest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -19,8 +20,8 @@ import java.util.Arrays;
 /**
  * Created by Amysue on 2016/6/12.
  */
-public class RoleTest {
-    @Rule
+public class RoleTest extends BaseTest{
+    /*@Rule
     public final ExpectedException exception = ExpectedException.none();
     private void initial(String ini) {
         String                   iniFile = "classpath:chapter3/shiro-" + ini + ".ini";
@@ -40,6 +41,10 @@ public class RoleTest {
         UsernamePasswordToken token   = new UsernamePasswordToken(username, password);
         subject.login(token);
         return subject;
+    }*/
+
+    public RoleTest() {
+        super("chapter3");
     }
 
     @Test
@@ -208,11 +213,6 @@ public class RoleTest {
         Assert.assertTrue(subject.isPermitted("+user3+2+printer"));
         Assert.assertFalse(subject.isPermitted("+user3+2"));
         Assert.assertFalse(subject.isPermitted("+user3+4+*"));
-    }
-
-    @After
-    public void tearDown() {
-        ThreadContext.unbindSubject();
     }
 
 }
