@@ -12,12 +12,11 @@ import org.mybatis.smvc.entity.User;
 import org.mybatis.smvc.entity.UserFind;
 import org.mybatis.smvc.enums.Role;
 import org.mybatis.smvc.exception.SmvcException;
+import org.mybatis.smvc.service.DepService;
 import org.mybatis.smvc.service.UserService;
 import org.mybatis.smvc.validators.Add;
 import org.mybatis.smvc.validators.CheckPassword;
-import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -39,6 +38,8 @@ import java.util.*;
 @Validated
 public class UserController {
     private UserService userService;
+    @Resource(name = "depService")
+    private DepService depService;
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
     @Resource(name = "userService")
@@ -49,14 +50,14 @@ public class UserController {
     @RequestMapping(value = "/add", method = RequestMethod.GET)
     public String add(Model model) {
         model.addAttribute(new User());
-        model.addAttribute("deps", userService.listDep());
+        model.addAttribute("deps", depService.cacheListDep());
         return "user/add";
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public String add(@Validated({Add.class}) User user, BindingResult br, Model model) {
         if (br.hasErrors()) {
-            model.addAttribute("deps", userService.listDep());
+            model.addAttribute("deps", depService.cacheListDep());
             return "user/add";
         }
         user.setRole(Role.NORMAL);
@@ -70,7 +71,7 @@ public class UserController {
             } else if (eMsg.startsWith("username:")) {
                 br.rejectValue("username", "error.user", eMsg.substring(eMsg.indexOf("username:") + "username:".length()));
             }
-            model.addAttribute("deps", userService.listDep());
+            model.addAttribute("deps", depService.cacheListDep());
             return "user/add";
         }
         return "redirect:/user/" + user.getId();

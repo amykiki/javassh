@@ -2,6 +2,8 @@ package org.mybatis.smvc.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mybatis.smvc.entity.Department;
 import org.mybatis.smvc.entity.User;
 import org.mybatis.smvc.entity.UserFind;
@@ -10,6 +12,11 @@ import org.mybatis.smvc.mapper.DepMapper;
 import org.mybatis.smvc.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,12 +32,17 @@ public class UserService {
     @Autowired
     private UserMapper                     userMapper;
     @Autowired
-    private DepMapper                      depMapper;
+    private DepService depService;
     private @Value("${user.pageSize}") int pageSize;
     private @Value("${user.navPages}") int navPages;
+    private Logger logger = LogManager.getLogger(UserService.class);
 
-    public void add(User user) throws SmvcException{
-        Department dep = depMapper.load(user.getDep().getId());
+    @Caching(put = {
+            @CachePut(value = CacheConstants.USER, key = "#result.id"),
+            @CachePut(value = CacheConstants.USER, key = "#result.username")
+    })
+    public User add(User user) throws SmvcException{
+        Department dep = depService.load(user.getDep().getId());
         if (dep == null) {
             throw new SmvcException("dep:不存在的部门");
         }
@@ -38,16 +50,28 @@ public class UserService {
         if (count > 0) {
             throw new SmvcException("username:用户名[" + user.getUsername() + "]已存在");
         }
-        userMapper.add(user);
+        int id = userMapper.add(user);
+        user.setId(id);
+        user.setDep(dep);
+        return user;
     }
 
+    private void loggerHit(String msg) {
+        logger.info("Cache hit MISSING,[" + msg + "]");
+    }
+
+    @Cacheable(value = CacheConstants.USER, key = "#id", unless = "#result == null")
     public User load(int id) {
+        loggerHit("" + id);
         User u = userMapper.LoadEager(id);
         return u;
     }
 
-    public List<Department> listDep() {
-        return depMapper.list();
+    @Cacheable(value = CacheConstants.USER, key = "#username", unless = "#result == null")
+    public User loadByUsername(String username) {
+        loggerHit(username);
+        User u = userMapper.loadByUsername(username);
+        return u;
     }
 
     public void addByMap(Map<String, Object> umap) {
@@ -79,6 +103,32 @@ public class UserService {
         return pager;
     }
 
+    @Caching( put = {
+            @CachePut(value = CacheConstants.USER, key = "#result.id"),
+            @CachePut(value = CacheConstants.USER, key = "#result.username")
+    })
+    public User updateRole(User user) {
+        userMapper.update(user);
+        user = userMapper.LoadEager(user.getId());
+        return user;
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = CacheConstants.USER, key = "#id"),
+            @CacheEvict(value = CacheConstants.USER, key = "#root.target.cacheUsername(#root.caches[0], #id)", condition = "#root.target.canEvict(#root.caches[0], #id)")
+    })
+    public void deleteById(int id) {
+        userMapper.deleteById(id);
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = CacheConstants.USER, key = "#username"),
+            @CacheEvict(value = CacheConstants.USER, key = "#root.target.cacheUserId(#root.caches[0], #username)", condition = "#root.target.canEvict(#root.caches[0], #username)")
+    })
+    public void deleteByUsername(String username) {
+        userMapper.deleteByUsername(username);
+    }
+
     public List<User> listAllSendUsers(int uId) {
         return userMapper.listAllSendUsers(uId);
     }
@@ -92,10 +142,6 @@ public class UserService {
     }
     public User loadByParam(int id, List<String> cols) {
         return userMapper.loadByParam(id, cols);
-    }
-
-    public User loadByUsername(String username) {
-        return userMapper.loadByUsername(username);
     }
 
     public User loadByParamUsername(String username, String... params) {
@@ -117,9 +163,36 @@ public class UserService {
         userMapper.update(nu);
     }
 
-    public User updateRole(User user) {
-        userMapper.update(user);
-        user = userMapper.LoadEager(user.getId());
-        return user;
+    private boolean canEvict(Cache userCache, Object key) {
+        User cacheUser = getCacheUser(userCache, key);
+        if (cacheUser == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
+
+    private int cacheUserId(Cache userCache, Object key) {
+        User cacheUser = getCacheUser(userCache, key);
+        if (cacheUser == null) {
+            return -1;
+        } else {
+            return cacheUser.getId();
+        }
+    }
+
+    private String cacheUsername(Cache userCache, Object key) {
+        User cacheUser = getCacheUser(userCache, key);
+        if (cacheUser == null) {
+            return null;
+        } else {
+            return cacheUser.getUsername();
+        }
+    }
+
+    private User getCacheUser(Cache userCache, Object key) {
+        User cacheUser = userCache.get(key, User.class);
+        return cacheUser;
+    }
+
 }

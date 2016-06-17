@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 /**
  * Created by Amysue on 2016/6/12.
@@ -57,7 +58,7 @@ public class AuthController {
         User lguser = userService.loadByUsername(user.getUsername());
         subject.getSession().setAttribute("lguser", lguser);
         SavedRequest req = WebUtils.getSavedRequest(null);
-        if (req != null) {
+        if (req != null && !req.getRequestUrl().equals("/")) {
             String url = req.getRequestUrl();
             return "redirect:"+url;
         } else {
@@ -69,7 +70,8 @@ public class AuthController {
     public String logout(Model model) {
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
-            SecurityUtils.getSubject().logout();
+//            SecurityUtils.getSubject().logout();
+            subject.logout();
             return "home";
         } else {
             return "redirect:login";

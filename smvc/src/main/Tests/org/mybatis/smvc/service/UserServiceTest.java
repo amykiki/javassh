@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by Amysue on 2016/5/25.
  */
@@ -27,6 +25,9 @@ public class UserServiceTest {
 
     @Resource(name = "userService")
     private UserService userService;
+
+    @Resource(name = "depService")
+    private DepService depService;
 
     @Test
     public void testAdd() throws Exception {
@@ -41,6 +42,52 @@ public class UserServiceTest {
         System.out.println(u.getId());
     }
 
+
+    @Test
+    public void testCache() throws Exception{
+        /*depService.cacheListDep();
+        User u = new User();
+        u.setEmail("amysue.z@gmail.com");
+        u.setNickname("testamy");
+        u.setPassword("1234321");
+        u.setRole(Role.ADMIN);
+        u.setUsername("amy01");
+        u.setDep(new Department(17));
+        User uCache= userService.add(u);
+        u.setId(uCache.getId());
+        System.out.println(u);
+
+        User u2 = userService.load(uCache.getId());
+        System.out.println(u2);*/
+
+        /*User u3 = userService.loadByUsername(u.getUsername());
+        System.out.println(u3);*/
+
+        /*u.setRole(Role.NORMAL);
+        userService.updateRole(u);
+        System.out.println(userService.load(u.getId()));*/
+        List<Department> list = depService.cacheListDep();
+        System.out.println(list.size());
+        int depid = depService.add(new Department("测试1")).getId();
+        list = depService.cacheListDep();
+        System.out.println(list.size());
+        depService.delete(depid);
+        list = depService.cacheListDep();
+        System.out.println(list.size());
+        for (Department dep : list) {
+            System.out.println(dep);
+        }
+
+//        System.out.println(userService.loadByUsername(u.getUsername()));
+    }
+
+    @Test
+    public void testAddDep() {
+        Department dep = new Department("测试1");
+        int id = depService.add(dep).getId();
+        System.out.println(id);
+        System.out.println(depService.load(id));
+    }
     @Test
     public void testList() throws Exception {
         List<User> users = userService.list();

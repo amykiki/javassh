@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by Amysue on 2016/5/25.
  */
 public interface UserMapper {
-    public void add(User user);
+    public int add(User user);
     public void addUsers(@Param("list") List<User>list);
 //    public void addUsers(@Param("userLists") List<User>users, @Param("id")List<Integer> id);
 
@@ -37,5 +37,8 @@ public interface UserMapper {
 
     public int countId(String username);
 
+    public void deleteById(int id);
+
+    public void deleteByUsername(String username);
 
 }

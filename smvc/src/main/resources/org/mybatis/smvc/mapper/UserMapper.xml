@@ -22,6 +22,12 @@
         INSERT INTO t_user(username, role, dep_id)
         VALUES (#{umap.username}, #{umap.role}, #{umap.dep.id})
     </insert>
+    <delete id="deleteById">
+        DELETE FROM t_user WHERE id = #{id}
+    </delete>
+    <delete id="deleteByUsername">
+        DELETE FROM t_user WHERE id = #{username}
+    </delete>
 
     <select id="findByMap" resultType="User">
         SELECT * FROM t_user LEFT JOIN t_dep d ON dep_id = d.id

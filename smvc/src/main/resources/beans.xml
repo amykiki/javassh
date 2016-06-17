@@ -11,9 +11,11 @@
        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
        http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd"
 >
+    <import resource="classpath:spring-cache.xml"/>
+    <import resource="classpath:spring-shiro-web.xml"/>
     <!--打开spring annotation支持-->
     <context:annotation-config/>
-    <context:component-scan base-package="org.mybatis.smvc.service"/>
+    <context:component-scan base-package="org.mybatis.smvc.service,org.mybatis.smvc.mapper"/>
     <!--属性占位符 PropertyPlaceholderConfigurer-->
     <context:property-placeholder location="classpath:jdbc.properties" ignore-unresolvable="true"/>
     <context:property-placeholder location="classpath:app.properties" ignore-unresolvable="true"/>
@@ -74,38 +76,12 @@
     <aop:config>
         <!--设置pointcut表示哪些方法需要加入事务处理-->
         <!--通常都会在Service来处理多个业务对象逻辑的关系，注入删除，更新等，此时如果在执行了一个步骤之后抛出异常就会导致数据不完整，所以事务不应该在DAO层处理，而应该在service-->
-        <aop:pointcut id="allMethods" expression="execution(* org.mybatis.smvc.service.*.*(..))"/>
+        <aop:pointcut id="allMethods" expression="execution(* org.mybatis.smvc.service.*.*(..)) and !execution(* org.mybatis.smvc.service.*.cache*(..))"/>
         <!--通过advisor确定具体要加入事务管理的方法-->
         <aop:advisor advice-ref="txAdvice" pointcut-ref="allMethods"/>
     </aop:config>
 
-    <!--shiro 配置-->
-    <bean id="userRealm" class="org.mybatis.smvc.realm.userRealm"/>
-    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
-        <property name="globalSessionTimeout" value="1800000"/>
-    </bean>
-    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
-        <property name="realm" ref="userRealm"/>
-        <!--Use Shiro Native Session Management-->
-        <!--<property name="sessionManager" ref="sessionManager"/>-->
-    </bean>
-
-
-    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
-        <property name="securityManager" ref="securityManager"/>
-        <property name="loginUrl" value="/login"/>
-        <property name="successUrl" value="/home"/>
-        <property name="unauthorizedUrl" value="/unauthorized"/>
-        <property name="filterChainDefinitions">
-            <value>
-                /resources/**=anon
-                /login=anon
-                /logout=anon
-                /**=authc
-            </value>
-        </property>
-    </bean>
-    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
-
+    <aop:aspectj-autoproxy/>
+    <bean class="org.mybatis.smvc.aspect.UpdateCacheList"/>
 </beans>
 

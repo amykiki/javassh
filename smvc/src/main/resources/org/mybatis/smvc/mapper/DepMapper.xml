@@ -3,11 +3,30 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.mybatis.smvc.mapper.DepMapper">
+    <insert id="add" parameterType="Department" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_dep(name) VALUES(#{name})
+    </insert>
+    <delete id="delete">
+        DELETE FROM t_dep WHERE id = #{id}
+    </delete>
 
     <select id="load" resultType="Department">
         SELECT * FROM t_dep WHERE id = #{id}
     </select>
     <select id="list" resultType="Department">
         SELECT * FROM t_dep;
+    </select>
+    <select id="listInIds" resultType="Department">
+        SELECT * FROM t_dep
+        <where>
+            id IN
+            <foreach collection="list" item="id"
+                     open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+    <select id="listAllIds" resultType="integer">
+        SELECT id FROM t_dep;
     </select>
 </mapper>

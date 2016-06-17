@@ -50,8 +50,8 @@
         SELECT * FROM t_msg
         <where>
             <!--<choose>
-                <when test="msg.delete != null">
-                    is_delete = #{msg.delete}
+                <when test="msg.deleteById != null">
+                    is_delete = #{msg.deleteById}
                 </when>
                 <otherwise>
                     is_delete = 0
