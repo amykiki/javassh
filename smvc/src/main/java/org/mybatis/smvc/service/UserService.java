@@ -2,14 +2,28 @@ package org.mybatis.smvc.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.sun.deploy.security.CredentialManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.crypto.RandomNumberGenerator;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.Subject;
 import org.mybatis.smvc.entity.Department;
 import org.mybatis.smvc.entity.User;
 import org.mybatis.smvc.entity.UserFind;
+import org.mybatis.smvc.entity.UserPsw;
 import org.mybatis.smvc.exception.SmvcException;
 import org.mybatis.smvc.mapper.DepMapper;
 import org.mybatis.smvc.mapper.UserMapper;
+import org.mybatis.smvc.realm.UserRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
@@ -18,11 +32,10 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * Created by Amysue on 2016/5/25.
@@ -33,8 +46,13 @@ public class UserService {
     private UserMapper                     userMapper;
     @Autowired
     private DepService depService;
+    @Resource(name = "userRealm")
+    private UserRealm userRealm;
     private @Value("${user.pageSize}") int pageSize;
     private @Value("${user.navPages}") int navPages;
+    private @Value("${credential.iteration}") int credentialIteration;
+    private @Value("${credential.algorithm}") String algorithm;
+    private @Value("${credential.storehex}") boolean storeHex;
     private Logger logger = LogManager.getLogger(UserService.class);
 
     @Caching(put = {
@@ -50,6 +68,9 @@ public class UserService {
         if (count > 0) {
             throw new SmvcException("username:用户名[" + user.getUsername() + "]已存在");
         }
+        UserPsw up = getPswSalt(user.getUsername(), user.getPassword());
+        user.setPassword(up.getPassword());
+        user.setSalt(up.getSalt());
         int id = userMapper.add(user);
         user.setId(id);
         user.setDep(dep);
@@ -65,6 +86,10 @@ public class UserService {
         loggerHit("" + id);
         User u = userMapper.LoadEager(id);
         return u;
+    }
+
+    public User loadLazy(int id) {
+        return userMapper.loadLazy(id);
     }
 
     @Cacheable(value = CacheConstants.USER, key = "#username", unless = "#result == null")
@@ -129,6 +154,11 @@ public class UserService {
         userMapper.deleteByUsername(username);
     }
 
+    public void updatePassword(int id, String username, String upassword) {
+        UserPsw up = getPswSalt(username, upassword);
+        userMapper.setPassword(id, up.getPassword(), up.getSalt());
+    }
+
     public List<User> listAllSendUsers(int uId) {
         return userMapper.listAllSendUsers(uId);
     }
@@ -148,21 +178,55 @@ public class UserService {
         return userMapper.loadByParamUsername(username, Arrays.asList(params));
     }
 
-    public void updatePwd(int id, String oldPwd, String newPwd) throws SmvcException{
-        User u = userMapper.loadLazy(id);
+    @Cacheable(value = CacheConstants.USER, key = "'auth' + #id")
+    public UserPsw loadAuthInfo(int id) {
+        return userMapper.loadAuthInfo(id);
+    }
+
+    @Cacheable(value = CacheConstants.USER, key = "'auth' + #username")
+    public UserPsw loadAuthInfo(String username) {
+        return userMapper.loadAuthInfoByUsername(username);
+    }
+
+    public List<String> listPermissions(String username) {
+        return userMapper.listPermissions(username);
+    }
+
+    @CacheEvict(value = CacheConstants.USER, key = "'auth' + #username")
+    public void updatePwd(String username, String oldPwd, String newPwd) throws SmvcException{
+        /*org.apache.shiro.cache.Cache<Object, AuthenticationInfo> shiroCache = userRealm.getAuthenticationCache();
+        Set<Object> keys = shiroCache.keys();
+        String key1 = (String)keys.iterator().next();
+        SimpleAuthenticationInfo value = (SimpleAuthenticationInfo) shiroCache.get(key1);
+        Collection<AuthenticationInfo> values = shiroCache.values();*/
+        UserPsw                                                  u          = loadAuthInfo(username);
         if (u == null) {
             throw new SmvcException("用户不存在");
         }
-        if (!u.getPassword().equals(oldPwd)) {
+        String password = getHashPassword(u.getUsername(), oldPwd, u.getSalt());
+        if (!password.equals(u.getPassword())) {
             throw new SmvcException("旧密码不正确");
         }
-
-        User nu = new User();
-        nu.setId(u.getId());
-        nu.setPassword(newPwd);
-        userMapper.update(nu);
+        updatePassword(u.getId(), u.getUsername(), newPwd);
+        Subject subject = SecurityUtils.getSubject();
+//        userRealm.clearCachedAuthenticationInfo(subject.getPrincipals());
+        userRealm.clearCachedAuthenticationInfoByKey(u.getUsername());
     }
 
+    private UserPsw getPswSalt(String username, String upassword) {
+        String salt2 = new SecureRandomNumberGenerator().nextBytes().toHex();
+        String salt = username + salt2;
+        SimpleHash hash = new SimpleHash(algorithm, upassword, salt, credentialIteration);
+        String password = hash.toHex();
+        return new UserPsw(password, salt2);
+    }
+
+    private String getHashPassword(String username, String upassword, String salt) {
+        salt = username + salt;
+        SimpleHash hash = new SimpleHash(algorithm, upassword, salt, credentialIteration);
+        String password = hash.toHex();
+        return password;
+    }
     private boolean canEvict(Cache userCache, Object key) {
         User cacheUser = getCacheUser(userCache, key);
         if (cacheUser == null) {

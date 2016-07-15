@@ -62,7 +62,8 @@ public class DepService {
     }
     @Cacheable(value = CacheConstants.DEP, key = "#id")
     public Department load(int id) {
-        return depMapper.load(id);
+        Department dep = depMapper.load(id);
+        return dep;
     }
 
     public List<Department> listDep(List<Integer> ids) {

@@ -17,23 +17,24 @@ import java.io.Serializable;
  */
 public class User implements Serializable {
     private static final long serialVersionUID = 2879893054128289558L;
-    private int        id;
+    private int id;
 
-    @Pattern(regexp = "[a-zA-Z]{4}[a-zA-Z0-9]{1,6}", message="{user.username.illegal}", groups = {Add.class, UpdatePwd.class})
+    @Pattern(regexp = "[a-zA-Z]{4}[a-zA-Z0-9]{1,6}", message = "{user.username.illegal}", groups = {Add.class, UpdatePwd.class})
     private String username;
 
     @Length(min = 4, max = 10, message = "{user.password.length}", groups = {Add.class, UpdatePwd.class})
-    private String     password;
+    private String password;
+    private String salt;
 
     @NotEmpty(message = "{user.nickname.empty}", groups = {Add.class, Update.class})
     @Forbidden(value = {"admin", "管理员"}, groups = {Add.class, Update.class})
-    private String     nickname;
+    private String nickname;
 
-    private Role       role;
+    private Role role;
 
-    @NotEmpty(message = "{user.email.empty}",groups = {Add.class, Update.class} )
+    @NotEmpty(message = "{user.email.empty}", groups = {Add.class, Update.class})
     @Email(message = "{user.email.illegal}", groups = {Add.class, Update.class})
-    private String     email;
+    private String email;
 
     @ValidUserDep(groups = {Add.class, Update.class})
     private Department dep;
@@ -84,6 +85,14 @@ public class User implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public Department getDep() {

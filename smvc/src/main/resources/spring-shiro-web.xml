@@ -1,20 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+       http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-4.1.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd"
 >
+    <context:property-placeholder location="classpath:app.properties" ignore-unresolvable="true"/>
+
     <!--shiro 配置-->
-    <bean id="userRealm" class="org.mybatis.smvc.realm.userRealm"/>
+    <bean id="credentialMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+        <property name="hashAlgorithmName" value="${credential.algorithm}"/>
+        <property name="hashIterations" value="${credential.iteration}"/>
+        <property name="storedCredentialsHexEncoded" value="${credential.storehex}"/>
+    </bean>
+    <bean id="shiroCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManagerConfigFile" value="classpath:shiro-cache.xml"/>
+    </bean>
+    <bean id="userRealm" class="org.mybatis.smvc.realm.UserRealm">
+        <property name="credentialsMatcher" ref="credentialMatcher"/>
+        <property name="cacheManager" ref="shiroCacheManager"/>
+        <property name="cachingEnabled" value="true"/>
+        <property name="authorizationCachingEnabled" value="true"/>
+        <property name="authorizationCacheName" value="authorizationCache"/>
+        <property name="authenticationCachingEnabled" value="true"/>
+        <property name="authenticationCacheName" value="authenticationCache"/>
+    </bean>
     <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
         <property name="globalSessionTimeout" value="1800000"/>
     </bean>
-    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
-        <property name="realm" ref="userRealm"/>
-        <!--Use Shiro Native Session Management-->
-        <!--<property name="sessionManager" ref="sessionManager"/>-->
-    </bean>
-
-
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager"/>
         <property name="loginUrl" value="/login"/>
@@ -25,6 +40,9 @@
                 /resources/**=anon
                 /login=anon
                 /logout=anon
+                /user/list?id*=roles[ADMIN]
+                /user/list=perms[sys:user:list]
+                /user/list/*=perms[sys:user:list]
                 /**=authc
             </value>
         </property>
@@ -33,4 +51,14 @@
         <property name="applicationName" value="没有权限，请登陆"/>
     </bean>-->
     <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    <!--<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="userRealm"/>
+        <!--Use Shiro Native Session Management-->
+        <!--<property name="sessionManager" ref="sessionManager"/>-->
+    </bean>
+    <aop:config proxy-target-class="true"></aop:config>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
 </beans>

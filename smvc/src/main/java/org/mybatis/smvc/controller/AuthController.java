@@ -58,7 +58,7 @@ public class AuthController {
         User lguser = userService.loadByUsername(user.getUsername());
         subject.getSession().setAttribute("lguser", lguser);
         SavedRequest req = WebUtils.getSavedRequest(null);
-        if (req != null && !req.getRequestUrl().equals("/")) {
+        if (req != null && !req.getRequestUrl().equals("/") && !req.getRequestUrl().equals("/favicon.ico")) {
             String url = req.getRequestUrl();
             return "redirect:"+url;
         } else {

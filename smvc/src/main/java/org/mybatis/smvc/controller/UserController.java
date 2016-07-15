@@ -4,14 +4,17 @@ import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.Subject;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
-import org.mybatis.smvc.entity.FormatModel;
-import org.mybatis.smvc.entity.PhoneNum;
-import org.mybatis.smvc.entity.User;
-import org.mybatis.smvc.entity.UserFind;
+import org.mybatis.smvc.entity.*;
 import org.mybatis.smvc.enums.Role;
 import org.mybatis.smvc.exception.SmvcException;
+import org.mybatis.smvc.realm.UserRealm;
 import org.mybatis.smvc.service.DepService;
 import org.mybatis.smvc.service.UserService;
 import org.mybatis.smvc.validators.Add;
@@ -37,9 +40,9 @@ import java.util.*;
 @RequestMapping("/user")
 @Validated
 public class UserController {
-    private UserService userService;
+    private UserService      userService;
     @Resource(name = "depService")
-    private DepService depService;
+    private DepService       depService;
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
     @Resource(name = "userService")
@@ -83,22 +86,22 @@ public class UserController {
         return "user/show";
     }
 
-    @RequestMapping(value = "/{id}/pwd", method = RequestMethod.GET)
+    @RequestMapping(value = "/pwd", method = RequestMethod.GET)
     public String updatePwd() {
         return "user/pwd";
     }
 
     @CheckPassword
-    @RequestMapping(value = "/{id}/pwd", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+    @RequestMapping(value = "/pwd", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String updatePwd(
             @Length(min = 4, max = 10, message = "密码长度必须在4-10之间") @NotBlank(message = "必须输入新密码") @RequestParam("newPwd") String newPwd,
             @NotBlank(message = "必须确认密码") @RequestParam("confirmPwd") String confirmPwd,
             @NotBlank(message = "必须输入原有密码") @RequestParam("oldPwd") String oldPwd,
-            @PathVariable int id,
             Model model) {
-
+        UserPsw userPsw = (UserPsw) SecurityUtils.getSubject().getPrincipal();
+        int id = userPsw.getId();
         try {
-            userService.updatePwd(id, oldPwd, newPwd);
+            userService.updatePwd(userPsw.getUsername(), oldPwd, newPwd);
         } catch (SmvcException e) {
             model.addAttribute("error", e.getMessage());
             return "user/pwd";

@@ -5,9 +5,12 @@
 
 <mapper namespace="org.mybatis.smvc.mapper.UserMapper">
 
+    <sql id="user_columns">
+        ${tb}.id, ${tb}.username, ${tb}.nickname, ${tb}.role, ${tb}.email, ${tb}.dep_id
+    </sql>
     <insert id="add" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO t_user(username, password, nickname, role, email, dep_id)
-        VALUES (#{username}, #{password}, #{nickname}, #{role}, #{email}, #{dep.id})
+        INSERT INTO t_user(username, password, salt, nickname, role, email, dep_id)
+        VALUES (#{username}, #{password}, #{salt}, #{nickname}, #{role}, #{email}, #{dep.id})
     </insert>
 
     <insert id="addUsers"  useGeneratedKeys="true"
@@ -68,12 +71,14 @@
         </set>
         where id = #{id}
     </update>
+    <update id="setPassword">
+        UPDATE t_user SET password = #{password}, salt = #{salt} where id = #{id}
+    </update>
 
     <resultMap id="userMap" type="User" autoMapping="false">
         <id property="id" column="id"/>
         <result property="username" column="username"/>
         <result property="nickname" column="nickname"/>
-        <result property="password" column="password"/>
         <result property="email" column="email"/>
         <result property="role" column="role"/>
         <association property="dep" javaType="Department">
@@ -85,7 +90,6 @@
         <id property="id" column="id"/>
         <result property="username" column="username"/>
         <result property="nickname" column="nickname"/>
-        <result property="password" column="password"/>
         <result property="email" column="email"/>
         <result property="role" column="role"/>
         <association property="dep" javaType="Department">
@@ -126,10 +130,10 @@
         WHERE u1.id = #{id}
     </select>
     <select id="loadLazy" resultMap="userMapLazy">
-        SELECT * FROM t_user WHERE id = #{id}
+        SELECT <include refid="user_columns"><property name="tb" value="u1"/></include> FROM t_user u1 WHERE id = #{id}
     </select>
     <select id="LoadEager" resultMap="userMap">
-        SELECT u1.*, dep.id as dep_id, dep.name as dep_name
+        SELECT <include refid="user_columns"><property name="tb" value="u1"/></include>, dep.id as dep_id, dep.name as dep_name
         FROM t_user u1
         LEFT JOIN t_dep dep ON u1.dep_id = dep.id
         WHERE u1.id = #{id}
@@ -157,7 +161,9 @@
         </where>
     </select>
     <select id="loadByUsername" resultMap="userMap">
-        SELECT u1.*, dep.id as dep_id, dep.name as dep_name
+        SELECT
+        <include refid="user_columns"><property name="tb" value="u1"/></include>
+        , dep.id as dep_id, dep.name as dep_name
         FROM t_user u1
         LEFT JOIN t_dep dep ON u1.dep_id = dep.id
         WHERE u1.username = #{username}
@@ -172,6 +178,18 @@
         </foreach>
         FROM t_user u1
         WHERE u1.username = #{username}
+    </select>
+    <select id="loadAuthInfo" resultType="UserPsw">
+        SELECT id, username, password, salt FROM t_user WHERE id = #{id}
+    </select>
+    <select id="listPermissions" resultType="string">
+        SELECT perm.permission
+        FROM t_user u INNER JOIN t_role_perm p ON u.role = p.role_id
+        LEFT JOIN t_perm perm ON p.perm_id = perm.id
+        WHERE u.username = #{username}
+    </select>
+    <select id="loadAuthInfoByUsername" resultType="UserPsw">
+        SELECT id, username, password, salt FROM t_user WHERE username = #{username}
     </select>
 
 </mapper>

@@ -15,7 +15,7 @@
     <import resource="classpath:spring-shiro-web.xml"/>
     <!--打开spring annotation支持-->
     <context:annotation-config/>
-    <context:component-scan base-package="org.mybatis.smvc.service,org.mybatis.smvc.mapper"/>
+    <context:component-scan base-package="org.mybatis.smvc.service,org.mybatis.smvc.mapper, org.mybatis.smvc.controller"/>
     <!--属性占位符 PropertyPlaceholderConfigurer-->
     <context:property-placeholder location="classpath:jdbc.properties" ignore-unresolvable="true"/>
     <context:property-placeholder location="classpath:app.properties" ignore-unresolvable="true"/>

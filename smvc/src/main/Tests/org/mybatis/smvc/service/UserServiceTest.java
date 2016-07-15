@@ -2,6 +2,12 @@ package org.mybatis.smvc.service;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.authc.credential.PasswordMatcher;
+import org.apache.shiro.util.ByteSource;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mybatis.smvc.entity.Department;
@@ -13,6 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.annotation.Resource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -34,9 +41,9 @@ public class UserServiceTest {
         User u = new User();
         u.setEmail("amysue.z@gmail.com");
         u.setNickname("testamy");
-        u.setPassword("1234321");
-        u.setRole(Role.ADMIN);
-        u.setUsername("amy01");
+        u.setPassword("1234");
+        u.setRole(Role.NORMAL);
+        u.setUsername("amysue01");
         u.setDep(new Department(17));
         userService.add(u);
         System.out.println(u.getId());
@@ -172,5 +179,90 @@ public class UserServiceTest {
     public void testListAllSendUsers() throws Exception {
         List<User> users = userService.listAllSendUsers(2);
         System.out.println("test");
+    }
+
+    @Test
+    public void testDeleteByUsername() throws Exception {
+
+    }
+
+    @Test
+    public void testLoadByParamUsername() throws Exception {
+
+    }
+
+    @Test
+    public void testLoad() {
+        int id = 1;
+        User user = userService.load(id);
+        System.out.println(user);
+        User user1 = userService.loadLazy(id);
+        System.out.println(user1);
+        User user2 = userService.loadByUsername("kevin9");
+        System.out.println(user2);
+    }
+
+    @Test
+    public void testLoadDep() {
+        int id = 17;
+        Department dep = depService.load(id);
+    }
+
+    @Test
+    public void testUpdatePwd() throws Exception {
+        int id = 7;
+        String username = "user21";
+        String upassword = "1234";
+        userService.updatePassword(id, username, upassword);
+    }
+
+    @Test
+    public void testLogin() throws Exception {
+        String username = "kevin9";
+        String upassword = "1234";
+        int id = 2;
+        String password = userService.loadAuthInfo(id).getPassword();
+        String salt = userService.loadAuthInfo(id).getSalt();
+
+        UsernamePasswordToken token = new UsernamePasswordToken(username, upassword);
+        SimpleAuthenticationInfo ai = new SimpleAuthenticationInfo(username, password, "realm1");
+        ai.setCredentialsSalt(ByteSource.Util.bytes(username+salt));
+        HashedCredentialsMatcher hcm = new HashedCredentialsMatcher();
+        hcm.setHashAlgorithmName("md5");
+        hcm.setHashIterations(2);
+        hcm.setStoredCredentialsHexEncoded(true);
+        Assert.assertTrue(hcm.doCredentialsMatch(token, ai));
+
+    }
+
+    @Test
+    public void testFindByPager() throws Exception {
+
+    }
+
+    @Test
+    public void testUpdateRole() throws Exception {
+
+    }
+
+    @Test
+    public void testDeleteById() throws Exception {
+
+    }
+
+    @Test
+    public void testUpdatePassword() throws Exception {
+
+    }
+
+    @Test
+    public void testLoadAuthInfo() throws Exception {
+
+    }
+
+    @Test
+    public void testListPermissions() throws Exception {
+        List<String> perms = userService.listPermissions("amysue");
+        System.out.println(perms.toString());
     }
 }

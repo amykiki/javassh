@@ -10,7 +10,6 @@ import java.util.List;
  * Created by Amysue on 2016/5/31.
  */
 public interface DepMapper {
-    @Cacheable(value = CacheConstants.DEP, key = "#id")
     public Department load(int id);
 
     public List<Department> list();

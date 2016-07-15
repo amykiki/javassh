@@ -116,7 +116,6 @@
                 <tr>
                     <th>id</th>
                     <th>用户名</th>
-                    <th>用户密码</th>
                     <th>用户昵称</th>
                     <th>用户邮箱</th>
                     <th>用户权限</th>
@@ -127,7 +126,6 @@
                     <tr>
                         <td>${luser.id}</td>
                         <td>${luser.username}</td>
-                        <td>${luser.password}</td>
                         <td>${luser.nickname}</td>
                         <td>${luser.email}</td>
                         <c:if test="${luser.role.toString() == 'ADMIN'}">
