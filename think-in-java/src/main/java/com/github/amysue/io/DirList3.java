@@ -1,0 +1,33 @@
+package com.github.amysue.io;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
+/**
+ * Created by Amysue on 2016/8/26.
+ */
+public class DirList3 {
+    public static void main(String[] args) {
+        File file = new File("D:\\IdealProj\\javaee\\src");
+//        String regex = "";
+        String regex = "Test.*";
+        String[] list;
+        if (regex.equals("")) {
+            list = file.list();
+        } else {
+            list = file.list(new FilenameFilter() {
+                private Pattern pattern = Pattern.compile(regex);
+                @Override
+                public boolean accept(File dir, String name) {
+                    return pattern.matcher(name).matches();
+                }
+            });
+        }
+        Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
+        for (String dirItem : list) {
+            System.out.println(dirItem);
+        }
+    }
+}
