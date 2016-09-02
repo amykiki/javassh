@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="com.spring.mvc.rest"/>
+    <context:property-placeholder location="classpath:dataConn.properties" ignore-unresolvable="true"/>
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${mysql.driver}"/>
+        <property name="url" value="${mysql.url}"/>
+        <property name="connectionProperties" value="${mysql.connectionProperties}"/>
+        <property name="username" value="${mysql.username}"/>
+        <property name="password" value="${mysql.password}"/>
+        <property name="maxTotal" value="${dbcp2.maxTotal}"/>
+        <property name="maxIdle" value="${dbcp2.maxIdle}"/>
+        <property name="minIdle" value="${dbcp2.minIdle}"/>
+        <property name="initialSize" value="${dbcp2.initialSize}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${dbcp2.timeBetweenEvictionRunsMillis}"/>
+        <property name="minEvictableIdleTimeMillis" value="${dbcp2.minEvictableIdleTimeMillis}"/>
+    </bean>
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="com.spring.mvc.rest.model"/>
+        <property name="hibernateProperties">
+            <props>
+                // 注意这里写properties的时候，前面一定要加上hibernate.，不能直接写property名字，这样设置无效
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!--配置哪些方法要加入事务管理-->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <!--让所有方法都加入事务管理，为了提高效率，可以把一些查询之类的方法设为只读-->
+            <tx:method name="*" propagation="REQUIRED" read-only="true"/>
+            <!-- 一下方法都是可能设计为要修改的方法，所以无法设为只读-->
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="del*" propagation="REQUIRED"/>
+            <tx:method name="save*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--配置AOP，Spring是通过AOP管理事务-->
+    <aop:config>
+        <aop:pointcut id="allMethods" expression="execution(* com.spring.mvc.rest.service.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="allMethods"/>
+    </aop:config>
+</beans>

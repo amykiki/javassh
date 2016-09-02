@@ -6,9 +6,12 @@
         </Console>
     </appenders>
     <loggers>
+        <logger name="org.hibernate.sql" level="debug" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
         <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="trace" additivity="false">
-        <appender-ref ref = "Console"/>
-    </logger>
+            <appender-ref ref = "Console"/>
+        </logger>
         <root level="info">
             <appender-ref ref="Console"/>
         </root>
