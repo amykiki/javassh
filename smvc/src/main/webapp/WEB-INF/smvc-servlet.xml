@@ -28,7 +28,7 @@
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="basenames">
             <list>
-                <value>message</value>
+                <value>message</value> //设置为message，则ResourceBundleMessageSource会试图在根路径属性文件中解析信息
                 <value>org.hibernate.validator.ValidationMessages</value>
             </list>
         </property>
