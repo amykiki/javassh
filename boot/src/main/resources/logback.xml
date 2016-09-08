@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- debug：打印logback内部日志信息，实时查看logback的运行状态，默认为false -->
+<!-- scan：配置文件如果发生改变，是否被重新加载，默认为true。 -->
+<!-- scanPeriod：设置检测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒，默认的时间间隔为1分钟，默认为true。 -->
+<configuration debug="false" scan="true" scanPeriod="30 seconds">
+    <contextName>BootApplication</contextName>
+    <!-- 时间戳定义，timeReference：使用日志产生日期为时间基准 -->
+    <timestamp key="byDay" datePattern="yyyy-MM-dd" timeReference="contextBirth" />
+
+    <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径，可以使用系统变量 -->
+    <!-- <property name="LOG_HOME" value="${app.home}/log" /> -->
+    <property name="LOG_HOME" value="D:\\Java\\ebook\\test\\log" />
+
+    <!-- 控制台输出，生产环境将请stdout去掉 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoder defaults to ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
+        <encoder>
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度，%msg：日志消息，%n是换行符 -->
+            <pattern>%highlight([%-5level]) %d{yyyy-MM-dd HH:mm:ss} %highlight(%logger{36}.%method) - %msg%n</pattern>
+            <charset>UTF-8</charset> <!-- 此处设置字符集 -->
+        </encoder>
+        <!-- STDOUT只记录INFO及以上级别 -->
+       <!-- <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>-->
+    </appender>
+    <!-- 按照每天生成日志文件 -->
+    <appender name="RollingFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 日志输出文件 -->
+        <file>${LOG_HOME}/LoggingBack-${byDay}.log</file>
+        <!-- 追加日志到原文件结尾 -->
+        <append>true</append>
+        <!-- timebasedrollingpolicy：演示时间和大小为基础的日志文件归档 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 归档的日志文件的路径，例如今天是2013-12-21日志，当前写的日志文件路径为file节点指定。 -->
+            <!--可以将此文件与file指定文件路径设置为不同路径，从而将当前日志文件或归档日志文件置不同的目录。 -->
+            <!--而2013-12-21的日志文件在由fileNamePattern指定。%d{yyyy-MM-dd}指定日期格式，%i指定索引 -->
+            <!-- 文件滚动日期格式：每天：.YYYY-MM-dd（默认）；每星期：.YYYY-ww；每月：.YYYY-MM -->
+            <!-- 每隔半天：.YYYY-MM-dd-a；每小时：.YYYY-MM-dd-HH；每分钟：.YYYY-MM-dd-HH-mm -->
+            <fileNamePattern>${LOG_HOME}/log-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 控制归档文件的最大数量的保存，删除旧的文件，默认单位天数 -->
+            <maxHistory>7</maxHistory>
+            <!-- 设置当前日志的文件的大小，决定日志翻滚 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- 除按日志记录之外，还配置了日志文件不能超过10M(默认)，若超过10M，日志文件会以索引0开始， -->
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.amy.spring.boot.logging.LoggingBack" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="RollingFILE" />
+    </root>
+</configuration>
